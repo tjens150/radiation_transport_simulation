@@ -153,12 +153,11 @@ for t in range(len(tt)):
         mastera=[]
         masterE=[]
         for i in range(N):
-
+            phistep=np.random.uniform(0,2*pi)
+            thetastep=np.random.uniform(0,pi)
             xlist=[0]
             ylist=[0]
             zlist=[0]
-            thetalist=[]
-            philist=[]
             
             dlna=0.0
             Elist=[Ei]
@@ -184,19 +183,8 @@ for t in range(len(tt)):
                     ptmp=nh0/(astep**(3/2.)*np.sqrt(omegaM)*H0)*c*cross(Eistep)
                     dlna=np.min([0.001/ptmp,0.001])
                     pxstep=ptmp*dlna
-            
-                if count == 0:
-                    thetastep=np.random.uniform(0,pi)
-                else:
-                    thetastep=np.arccos(rej(-1,1,pdfthet,maxPT,Eistep))
-
-                Efstep=1/(2/me*np.sin(thetastep/2.)**2+1/Eistep)
-                if Efstep > Eistep:
-                    pdb.set_trace()
-                phistep=np.random.uniform(0,2*pi)        
-                Lstep=(2/(H0*np.sqrt(omegaM))*(astep**(1/2.)-ai**(1/2.)))*c
-                thetalist.append(thetastep)
-                philist.append(phistep)
+                
+                Lstep=(2/(H0*np.sqrt(omegaM))*(astep**(1/2.)-ai**(1/2.)))*c    
                 vec=[[np.sin(thetastep)*np.cos(phistep)*Lstep],
                      [np.sin(thetastep)*np.sin(phistep)*Lstep],
                      [np.cos(thetastep)*Lstep]]
@@ -204,6 +192,13 @@ for t in range(len(tt)):
                 xlist.append(np.dot(rot,vec)[0]+xlist[-1])
                 ylist.append(np.dot(rot,vec)[1]+ylist[-1])
                 zlist.append(np.dot(rot,vec)[2]+zlist[-1])
+
+                phistep=np.random.uniform(0,2*pi)
+                thetastep=np.arccos(rej(-1,1,pdfthet,maxPT,Eistep))
+                Efstep=1/(2/me*np.sin(thetastep/2.)**2+1/Eistep)
+                if Efstep > Eistep:
+                    pdb.set_trace()
+                
                 rot=np.dot(rot,rotmat(thetastep,phistep))
                 Eistep=Efstep#*ai/astep
                 ai=np.copy(astep)
