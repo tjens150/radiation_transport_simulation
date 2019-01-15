@@ -112,6 +112,7 @@ def rotmat(thet,phi):
 #CONSTANTS
 me=.511*10**6
 astart=1/1301.
+afinal=1/51.
 c=299792458.0
 mpc=3.086*10**22
 sigT=6.652459*10**(-29.)
@@ -178,7 +179,7 @@ for t in range(len(tt)):
                     ppull=np.random.uniform(0,1)
                     Eistep=Eistep*astep/(astep*(1+dlna))
                     astep=astep*(1+dlna)
-                    if 1/astep-1 < 10:
+                    if 1/astep-1 < afinal:
                         break
                     ptmp=nh0/(astep**(3/2.)*np.sqrt(omegaM)*H0)*c*cross(Eistep)
                     dlna=np.min([0.001/ptmp,0.001])
@@ -205,9 +206,8 @@ for t in range(len(tt)):
                 Elist.append(Eistep)
                 alist.append(astep)
                 count+=1
-                if 1/ai-1 < 10:
+                if 1/ai-1 < afinal:
                     warning = 1
-                    print('WARNING')
                     #ax.plot(np.array(xlist)/mpc,np.array(ylist)/mpc,marker='^',markersize=2,lw=1,color=red)
                     break
 
