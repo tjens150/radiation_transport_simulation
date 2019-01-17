@@ -251,7 +251,7 @@ for astart in alist:
             masterR=[item for sublist in masterR for item in sublist]
             mastera=[item for sublist in mastera for item in sublist]
             masterE=[item for sublist in masterE for item in sublist]
-            tit='par'+str(int((1-thresh)*100))+'E'+str(Eim[ee])+'_'+str(Ntot)
+            tit='par'+str(int(1/astart-1))+'_'+str(int((1-thresh)*100))+'E'+str(Eim[ee])+'_'+str(Ntot)
             fil=tit+'.pkl'
             tit=tit+'.pdf'
             with open(fil, "wb") as f:
