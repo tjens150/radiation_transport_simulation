@@ -111,7 +111,8 @@ def rotmat(thet,phi):
 
 #CONSTANTS
 me=.511*10**6
-astart=1/1301.
+alist=[1/1401.,1/1301.,1/1201]
+
 zfinal=50.
 c=299792458.0
 mpc=3.086*10**22
@@ -126,7 +127,7 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-tt=[0.1] #Thres
+tt=[0.001] #Thres
 Eilist=[0.1,1,10]
 divy=int(size/len(Eilist))
 if size == 1:
@@ -142,8 +143,7 @@ newcomm=comm.Split(color,rank)
 newrank=newcomm.Get_rank()
 comm.Barrier()
 
-for t in range(len(tt)):
-    thresh=tt[t]
+for astart in alist:
     for ee in range(len(Eim)):
         Ei=Eim[ee]*me
         afarr=np.zeros(N)
@@ -168,7 +168,7 @@ for t in range(len(tt)):
             ai=np.copy(astart)
             warning=0
             rot=1.
-            while Eistep*ai/astart > thresh*Ei:
+            while 1/ai-1 > zfinal:
                 astep=np.copy(ai)
                 ptmp=nh0/(astep**(3/2.)*np.sqrt(omegaM)*H0)*c*cross(Eistep)
                 dlna=np.min([0.001/ptmp,0.001])
@@ -183,7 +183,10 @@ for t in range(len(tt)):
                     ptmp=nh0/(astep**(3/2.)*np.sqrt(omegaM)*H0)*c*cross(Eistep)
                     dlna=np.min([0.001/ptmp,0.001])
                     pxstep=ptmp*dlna
-                
+                if 1/astep-1 < zfinal:
+                    warning = 1
+                    #ax.plot(np.array(xlist)/mpc,np.array(ylist)/mpc,marker='^',markersize=2,lw=1,color=red)
+                    break
                 Lstep=(2/(H0*np.sqrt(omegaM))*(astep**(1/2.)-ai**(1/2.)))*c    
                 vec=[[np.sin(thetastep)*np.cos(phistep)*Lstep],
                      [np.sin(thetastep)*np.sin(phistep)*Lstep],
@@ -205,10 +208,7 @@ for t in range(len(tt)):
                 Elist.append(Eistep)
                 alist.append(astep)
                 count+=1
-                if 1/ai-1 < zfinal:
-                    warning = 1
-                    #ax.plot(np.array(xlist)/mpc,np.array(ylist)/mpc,marker='^',markersize=2,lw=1,color=red)
-                    break
+                
 
             afarr[i]=1/ai-1
             Narr[i]=count
@@ -248,6 +248,9 @@ for t in range(len(tt)):
             Rlist=resRlist.flatten()
             afarr=resafarr.flatten()
             Narr=resNarr.flatten()
+            masterR=[item for sublist in masterR for item in sublist]
+            mastera=[item for sublist in mastera for item in sublist]
+            masterE=[item for sublist in masterE for item in sublist]
             tit='par'+str(int((1-thresh)*100))+'E'+str(Eim[ee])+'_'+str(Ntot)
             fil=tit+'.pkl'
             tit=tit+'.pdf'
