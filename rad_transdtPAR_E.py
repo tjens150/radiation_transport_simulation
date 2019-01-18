@@ -219,9 +219,9 @@ for astart in alist:
             Narr[i]=count
             Rarr=np.sqrt(np.array(xlist[-1])**2+np.array(ylist[-1])**2+np.array(zlist[-1])**2)/mpc
 
-            masterx.append(np.array(xlist/mpc))
-            mastery.append(np.array(ylist/mpc))
-            masterz.append(np.array(zlist/mpc))
+            masterx.append(np.array(xlist)/mpc)
+            mastery.append(np.array(ylist)/mpc)
+            masterz.append(np.array(zlist)/mpc)
             mastera.append(np.array(alist))
             masterE.append(np.array(Elist))
             Rlist[i]=Rarr
