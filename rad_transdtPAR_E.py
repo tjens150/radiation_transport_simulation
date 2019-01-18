@@ -107,11 +107,15 @@ def rotmat(thet,phi):
 
 #if __name__ =="__main__":
 
-
+##
+## At the moment this is only assuming matter domination
+## and that photons interact with ALL electrons regardless if free or bound
+## (i.e. ionization fraction not implemented)
+##
 
 #CONSTANTS
 me=.511*10**6
-alist=[1/1401.,1/1301.,1/1201]
+alist=[1/1401.,1/1301.,1/1201.]
 
 zfinal=50.
 c=299792458.0
@@ -127,7 +131,6 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-tt=[0.001] #Thres
 Eilist=[0.1,1,10]
 divy=int(size/len(Eilist))
 if size == 1:
@@ -149,7 +152,9 @@ for astart in alist:
         afarr=np.zeros(N)
         Rlist=np.zeros(N)
         Narr=np.zeros(N, dtype=int)
-        masterR=[]
+        masterx=[]
+        mastery=[]
+        masterz=[]
         mastera=[]
         masterE=[]
         for i in range(N):
@@ -212,11 +217,14 @@ for astart in alist:
 
             afarr[i]=1/ai-1
             Narr[i]=count
-            Rarr=np.sqrt(np.array(xlist)**2+np.array(ylist)**2+np.array(zlist)**2)/mpc
-            masterR.append(np.array(Rarr))
+            Rarr=np.sqrt(np.array(xlist[-1])**2+np.array(ylist[-1])**2+np.array(zlist[-1])**2)/mpc
+
+            masterx.append(np.array(xlist/mpc))
+            mastery.append(np.array(ylist/mpc))
+            masterz.append(np.array(zlist/mpc))
             mastera.append(np.array(alist))
             masterE.append(np.array(Elist))
-            Rlist[i]=Rarr[-1]
+            Rlist[i]=Rarr
             if rank == 0:
                 print(i,'of ',N)
             #if not warning:    
@@ -238,7 +246,11 @@ for astart in alist:
         newcomm.Gather(np.array(Rlist), resRlist, root=0)
         newcomm.Gather(np.array(afarr), resafarr, root=0)
         newcomm.Gather(np.array(Narr), resNarr, root=0)
-        masterR=newcomm.gather(masterR,root=0)
+        
+
+        masterx=newcomm.gather(masterx,root=0)
+        mastery=newcomm.gather(mastery,root=0)
+        masterz=newcomm.gather(masterz,root=0)
         mastera=newcomm.gather(mastera,root=0)
         masterE=newcomm.gather(masterE,root=0)
         
@@ -248,10 +260,12 @@ for astart in alist:
             Rlist=resRlist.flatten()
             afarr=resafarr.flatten()
             Narr=resNarr.flatten()
-            masterR=[item for sublist in masterR for item in sublist]
+            masterx=[item for sublist in masterx for item in sublist]
+            mastery=[item for sublist in mastery for item in sublist]
+            masterz=[item for sublist in masterz for item in sublist]
             mastera=[item for sublist in mastera for item in sublist]
             masterE=[item for sublist in masterE for item in sublist]
-            tit='par'+str(int(1/astart-1))+'_'+str(int((1-thresh)*100))+'E'+str(Eim[ee])+'_'+str(Ntot)
+            tit='par'+str(int(1/astart-1))+'_'+'E'+str(Eim[ee])+'_'+str(Ntot)
             fil=tit+'.pkl'
             tit=tit+'.pdf'
             with open(fil, "wb") as f:
@@ -259,7 +273,9 @@ for astart in alist:
                 pickle.dump(np.array(afarr),f)
                 pickle.dump(np.array(Narr),f)
             with open('full'+fil, "wb") as f:
-                pickle.dump(masterR,f)
+                pickle.dump(masterx,f)
+                pickle.dump(mastery,f)
+                pickle.dump(masterz,f)
                 pickle.dump(mastera,f)
                 pickle.dump(masterE,f)
             #with open(fil,"rb") as f:
