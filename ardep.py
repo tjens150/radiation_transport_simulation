@@ -110,7 +110,7 @@ print('Done loading, starting binning')
 
 assign_a=np.digitize(np.log(a),alogbins)
 totnum=0.
-result=np.zeros([nrbins,len(alogbins)])
+result=np.zeros([nrbins-1,len(alogbins)-1])
 rdep={}
 #nphotind={}
 nphotbin={}
@@ -149,7 +149,8 @@ for i in reversed(range(1,len(alogbins))):
                 dEph=dEale[wh_ph][lim]
                 aph=aale[wh_ph][lim]
                 dEph[0]=0.
-                result+=binned_statistic_2d(newr[lim],aph,dEph,statistic='sum', bins=[rbins,alogbins])
+                #pdb.set_trace()
+                result+=np.array(binned_statistic_2d(newr[lim],aph,dEph,statistic='sum', bins=[rbins,alogbins])[0])
                 #result+=np.array(binned_statistic(newr[lim], dEph, np.sum, nrbins, [0,rmax]))
                 #assign_r=np.digitize(newr,rbins)
                 #result+=np.array([dE[assign_r == tt].sum() for tt in range(1, len(rbins))])
@@ -160,7 +161,7 @@ for i in reversed(range(1,len(alogbins))):
             Emean[dicstr]=E[wh_a][wh_E][uind].mean()
             print('i=%s, j=%s bin takes %s' % (i,j,time.time()-tbin))
                 #/(astep*4/3*pi*(rbins[tt-1]**3-rbins[tt]**3))
-with open('rdep45000_v1.pkl', "wb") as f:
+with open('ardep45000_v1.pkl', "wb") as f:
     pickle.dump(rdep,f)
     pickle.dump(totnum,f)
     pickle.dump(nphotbin,f)
