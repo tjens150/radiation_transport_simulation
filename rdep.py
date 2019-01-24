@@ -6,6 +6,20 @@ from math import pi
 import pickle as pickle
 from mpi4py import MPI
 import time
+from scipy.sparse import csr_matrix
+
+def binned_statistic(xx, values, func, nbins, rrange):
+    
+    'The usage is nearly the same as scipy.stats.binned_statistic'
+    
+    N = len(values)
+    r0, r1 = rrange
+    
+    digitized = (float(nbins)/(r1 - r0)*(xx - r0)).astype(int)
+
+    S = csr_matrix((values, [digitized, np.arange(N)]), shape=(nbins, N))
+    
+    return [func(group) for group in np.split(S.data, S.indptr[1:-1])]
 
 
 #CONSTANTS
@@ -35,6 +49,7 @@ rmax=200 #mpc
 alogbins=np.arange(np.log(astart),np.log(afinal),astep)
 Ebins=np.linspace(me*Emax,me*Emin,nEbins)
 rbins=np.arange(0,rmax,rstep)
+nrbins=int(rmax/0.1)
 
 x=[]
 y=[]
@@ -92,39 +107,50 @@ print('Done loading, starting binning')
 
 assign_a=np.digitize(np.log(a),alogbins)
 totnum=0.
-result=np.zeros(len(rbins)-1)
+result=np.zeros(nrbins)
 rdep={}
 nphot={}
 amean={}
 Emean={}
 ttot=time.time()
-for i in (range(1,len(alogbins))):
-    wh_a=np.where(assign_a == i)
-    wh_ale=np.where(assign_a >= i)
+
+for i in reversed(range(1,len(alogbins))):
+    wh_a=(assign_a == i)
+    wh_ale=(assign_a >= i)
     assign_E=np.digitize(E[wh_a],Ebins,right=True)
     # if not np.all(assign2 == len(Ebins)):
     for j in range(1,len(Ebins)):
         dicstr='z%s_E%s' % (int(1/np.exp(alogbins[i])-1),Ebins/me)
-        wh_E=np.where(assign_E == j)
+        wh_E=(assign_E == j)
         uid=np.unique(num[wh_a][wh_E])
         numphot=uid.size
         totnum+=numphot
         tbin=time.time()
+        numale=num[wh_ale]
+        xale=x[wh_ale]
+        yale=y[wh_ale]
+        zale=z[wh_ale]
+        dEale=dE[wh_ale]
         if numphot > thresh:
             print('Number of photons: %s' % (numphot))
             for k in uid:
-                wh_ph=np.where(num[wh_ale] == k)
-                newx=x[wh_ale][wh_ph]-x[wh_ale][wh_ph][0]
-                newy=y[wh_ale][wh_ph]-y[wh_ale][wh_ph][0]
-                newz=z[wh_ale][wh_ph]-z[wh_ale][wh_ph][0]
+                #tmptime=time.time()
+                wh_ph=(numale == k)
+                newx=xale[wh_ph]-xale[wh_ph][0]
+                newy=yale[wh_ph]-yale[wh_ph][0]
+                newz=zale[wh_ph]-zale[wh_ph][0]
                 newr=np.sqrt(newx*newx+newy*newy+newz*newz)
-                assign_r=np.digitize(newr,rbins)
-                result+=np.array([dE[assign_r == tt].sum() for tt in range(1, len(rbins))])
+                lim=newr < 200
+                dEph=dEale[wh_ph][lim]
+                result+=np.array(binned_statistic(newr[lim], dEph, np.sum, nrbins, [0,rmax]))
+                #assign_r=np.digitize(newr,rbins)
+                #result+=np.array([dE[assign_r == tt].sum() for tt in range(1, len(rbins))])
+                #print(time.time() - tmptime)
             rdep[dicstr]=result
             nphot[dicstr]=numphot
             amean[dicstr]=a[wh_a][wh_E].mean()
             Emean[dicstr]=E[wh_a][wh_E].mean()
-        print('i=%s, j=%s bin takes %s' % (i,j,time.time()-tbin))
+            print('i=%s, j=%s bin takes %s' % (i,j,time.time()-tbin))
                 #/(astep*4/3*pi*(rbins[tt-1]**3-rbins[tt]**3))
 with open('rdep45000_v1.pkl', "wb") as f:
     pickle.dump(rdep)
