@@ -48,6 +48,7 @@ rstep=0.1 #mpc
 rmax=200 #mpc
 alogbins=np.arange(np.log(astart),np.log(afinal),astep)
 Ebins=np.linspace(me*Emax,me*Emin,nEbins)
+Ebins=[10*me,5*me, 1.1*me,0.11*me,0.05*me]
 rbins=np.arange(0,rmax,rstep)
 nrbins=int(rmax/0.1)
 
@@ -65,9 +66,10 @@ num=[]
 # Edic={}
 count=0
 print('Loading in data...')
+numdata=5000
 for zi in zread:
     for Ei in Eread:
-        fil='%s/fullpar%s_E%s_5000.pkl' % (zi,zi,Ei)
+        fil='%s/fullpar%s_E%s_%s.pkl' % (zi,zi,Ei,numdata)
         with open(fol+fil,"rb") as f:
             masterx=pickle.load(f)
             mastery=pickle.load(f)
@@ -82,7 +84,7 @@ for zi in zread:
             deltE=np.append(0,deltE)
             tmpdE.append(deltE)
         reparr=[len(item) for item in mastera]
-        num.append(np.repeat(np.arange(5000)+count*5000,reparr))
+        num.append(np.repeat(np.arange(numdata)+count*numdata,reparr))
         x.append(np.concatenate(masterx))
         y.append(np.concatenate(mastery))
         z.append(np.concatenate(masterz))
@@ -109,7 +111,8 @@ assign_a=np.digitize(np.log(a),alogbins)
 totnum=0.
 result=np.zeros(nrbins)
 rdep={}
-nphot={}
+#nphotind={}
+nphotbin={}
 amean={}
 Emean={}
 ttot=time.time()
@@ -120,9 +123,9 @@ for i in reversed(range(1,len(alogbins))):
     assign_E=np.digitize(E[wh_a],Ebins,right=True)
     # if not np.all(assign2 == len(Ebins)):
     for j in range(1,len(Ebins)):
-        dicstr='z%s_E%s' % (int(1/np.exp(alogbins[i])-1),Ebins/me)
+        dicstr='z%s_E%s' % (int(1/np.exp(alogbins[i])-1),Ebins[j]/me)
         wh_E=(assign_E == j)
-        uid=np.unique(num[wh_a][wh_E])
+        uid,uind=np.unique(num[wh_a][wh_E], return_index=True)
         numphot=uid.size
         totnum+=numphot
         tbin=time.time()
@@ -140,23 +143,25 @@ for i in reversed(range(1,len(alogbins))):
                 newy=yale[wh_ph]-yale[wh_ph][0]
                 newz=zale[wh_ph]-zale[wh_ph][0]
                 newr=np.sqrt(newx*newx+newy*newy+newz*newz)
-                lim=newr < 200
+                lim=newr < rmax
                 dEph=dEale[wh_ph][lim]
+                dEph[0]=0.
                 result+=np.array(binned_statistic(newr[lim], dEph, np.sum, nrbins, [0,rmax]))
                 #assign_r=np.digitize(newr,rbins)
                 #result+=np.array([dE[assign_r == tt].sum() for tt in range(1, len(rbins))])
                 #print(time.time() - tmptime)
             rdep[dicstr]=result
-            nphot[dicstr]=numphot
-            amean[dicstr]=a[wh_a][wh_E].mean()
-            Emean[dicstr]=E[wh_a][wh_E].mean()
+            nphotbin[dicstr]=numphot
+            amean[dicstr]=a[wh_a][wh_E][uind].mean()
+            Emean[dicstr]=E[wh_a][wh_E][uind].mean()
             print('i=%s, j=%s bin takes %s' % (i,j,time.time()-tbin))
                 #/(astep*4/3*pi*(rbins[tt-1]**3-rbins[tt]**3))
 with open('rdep45000_v1.pkl', "wb") as f:
-    pickle.dump(rdep)
-    pickle.dump(totnum)
-    pickle.dump(nphot)
-    pickle.dump(amean)
-    pickle.dump(Emean)
+    pickle.dump(rdep,f)
+    pickle.dump(totnum,f)
+    pickle.dump(nphotbin,f)
+    #pickle.dump(nphotind,f)
+    pickle.dump(amean,f)
+    pickle.dump(Emean,f)
     
 print(time.time()-ttot)
