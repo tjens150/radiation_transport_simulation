@@ -18,14 +18,41 @@ purple=(173/255,139/255,201/255)
 
 
 def eps(Ei,a):
-    return a**(-3/2.)*nh0*c*((3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2))
+    return a**(-3.)*nh0*c*((3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2))
+
+# def stddeveps(Ei,a):
+#     return np.sqrt((Ei**3*((-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5)/(2*Ei + me)**4 + 3*(Ei - 2*me - (4*me**2)/Ei)*np.log(1 + (2*Ei)/me)))/((Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**2 + (Ei**2 - 2*Ei*me - 2*me**2)*np.arctanh(Ei/(Ei + me))))/np.sqrt(6)
+
+def stddeveps(Ei,a):
+    return 2*np.sqrt(0.6666666666666666)*np.sqrt((Ei**2*((-3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me)))**2)/(8.*Ei**2*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))) + (me*sigT*((-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5)/(2*Ei + me)**4 + 3*(Ei - 2*me - (4*me**2)/Ei)*np.log(1 + (2*Ei)/me)))/8.))/(me*sigT*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))))
 
 def deps(Ei,a):
     return 1/(H0*np.sqrt(omegaM)*a**(3/2.))*nh0*c*((3*me*sigT*((2*Ei*(-40*Ei**3 + 153*Ei**2*me + 186*Ei*me**2 + 51*me**3))/(3.*(2*Ei + me)**3) - (4*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(2*Ei + me)**4 + (2*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + (2*(Ei - 3*me)*(Ei + me)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(1 - Ei**2/(Ei + me)**2) + 2*(Ei - 3*me)*np.arctanh(Ei/(Ei + me)) + 2*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2) - (3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(4.*Ei**3))
 
+def sigthet(Ei):
+    return 3/8.*sigT*(2*me*((Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**2 + (Ei**2 - 2*Ei*me - 2*me**2)*np.arctanh(Ei/(Ei + me))))/Ei**3
+
+def dsigthet(Ei):
+    return 3/8.*sigT*((2*me*((Ei*(3*Ei**2 + 18*Ei*me + 8*me**2))/(2*Ei + me)**2 - (4*Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**3 + (Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3)/(2*Ei + me)**2 + ((Ei**2 - 2*Ei*me - 2*me**2)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(1 - Ei**2/(Ei + me)**2) + (2*Ei - 2*me)*np.arctanh(Ei/(Ei + me))))/Ei**3 - (6*me*((Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**2 + (Ei**2 - 2*Ei*me - 2*me**2)*np.arctanh(Ei/(Ei + me))))/Ei**4)
+
+# def stddevdeps(Ei,a):
+#     return ((Ei**3*((6*(Ei - 2*me - (4*me**2)/Ei))/((1 + (2*Ei)/me)*me) + (-340*Ei**4 + 736*Ei**3*me + 1698*Ei**2*me**2 + 988*Ei*me**3 + 180*me**4)/(2*Ei + me)**4 - (8*(-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5))/(2*Ei + me)**5 + 3*(1 + (4*me**2)/Ei**2)*np.log(1 + (2*Ei)/me)))/((Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**2 + (Ei**2 - 2*Ei*me - 2*me**2)*np.arctanh(Ei/(Ei + me))) - (Ei**3*((Ei*(3*Ei**2 + 18*Ei*me + 8*me**2))/(2*Ei + me)**2 - (4*Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**3 + (Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3)/(2*Ei + me)**2 + ((Ei**2 - 2*Ei*me - 2*me**2)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(1 - Ei**2/(Ei + me)**2) + (2*Ei - 2*me)*np.arctanh(Ei/(Ei + me)))*((-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5)/(2*Ei + me)**4 + 3*(Ei - 2*me - (4*me**2)/Ei)*np.log(1 + (2*Ei)/me)))/((Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**2 + (Ei**2 - 2*Ei*me - 2*me**2)*np.arctanh(Ei/(Ei + me)))**2 + (3*Ei**2*((-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5)/(2*Ei + me)**4 + 3*(Ei - 2*me - (4*me**2)/Ei)*np.log(1 + (2*Ei)/me)))/((Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**2 + (Ei**2 - 2*Ei*me - 2*me**2)*np.arctanh(Ei/(Ei + me))))/(2.*np.sqrt(6)*np.sqrt((Ei**3*((-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5)/(2*Ei + me)**4 + 3*(Ei - 2*me - (4*me**2)/Ei)*np.log(1 + (2*Ei)/me)))/((Ei*(Ei**3 + 9*Ei**2*me + 8*Ei*me**2 + 2*me**3))/(2*Ei + me)**2 + (Ei**2 - 2*Ei*me - 2*me**2)*np.arctanh(Ei/(Ei + me)))))
+
+
+def stddevdeps(Ei,a):
+    return (np.sqrt(0.6666666666666666)*((Ei**2*((3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me)))**2*((2*Ei)/((1 + (2*Ei)/me)*me) - (8*Ei**2*(Ei + me))/(2*Ei + me)**3 + (2*Ei**2)/(2*Ei + me)**2 + (4*Ei*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(Ei*(1 - Ei**2/(Ei + me)**2)) - (4*me*np.arctanh(Ei/(Ei + me)))/Ei + (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei**2 + np.log(1 + (2*Ei)/me)))/(8.*Ei**2*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))**2) - (3*me*sigT*((2*Ei*(-40*Ei**3 + 153*Ei**2*me + 186*Ei*me**2 + 51*me**3))/(3.*(2*Ei + me)**3) - (4*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(2*Ei + me)**4 + (2*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + (2*(Ei - 3*me)*(Ei + me)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(1 - Ei**2/(Ei + me)**2) + 2*(Ei - 3*me)*np.arctanh(Ei/(Ei + me)) + 2*(Ei + me)*np.arctanh(Ei/(Ei + me)))*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(4.*Ei**2*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))) + (3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me)))**2)/(4.*Ei**3*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))) + (me*sigT*((6*(Ei - 2*me - (4*me**2)/Ei))/((1 + (2*Ei)/me)*me) + (-340*Ei**4 + 736*Ei**3*me + 1698*Ei**2*me**2 + 988*Ei*me**3 + 180*me**4)/(2*Ei + me)**4 - (8*(-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5))/(2*Ei + me)**5 + 3*(1 + (4*me**2)/Ei**2)*np.log(1 + (2*Ei)/me)))/8.))/(me*sigT*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))) - (Ei**2*((2*Ei)/((1 + (2*Ei)/me)*me) - (8*Ei**2*(Ei + me))/(2*Ei + me)**3 + (2*Ei**2)/(2*Ei + me)**2 + (4*Ei*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(Ei*(1 - Ei**2/(Ei + me)**2)) - (4*me*np.arctanh(Ei/(Ei + me)))/Ei + (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei**2 + np.log(1 + (2*Ei)/me))*((-3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me)))**2)/(8.*Ei**2*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))) + (me*sigT*((-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5)/(2*Ei + me)**4 + 3*(Ei - 2*me - (4*me**2)/Ei)*np.log(1 + (2*Ei)/me)))/8.))/(me*sigT*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))**2) + (2*Ei*((-3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me)))**2)/(8.*Ei**2*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))) + (me*sigT*((-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5)/(2*Ei + me)**4 + 3*(Ei - 2*me - (4*me**2)/Ei)*np.log(1 + (2*Ei)/me)))/8.))/(me*sigT*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me)))))/np.sqrt((Ei**2*((-3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me)))**2)/(8.*Ei**2*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))) + (me*sigT*((-68*Ei**5 + 184*Ei**4*me + 566*Ei**3*me**2 + 494*Ei**2*me**3 + 180*Ei*me**4 + 24*me**5)/(2*Ei + me)**4 + 3*(Ei - 2*me - (4*me**2)/Ei)*np.log(1 + (2*Ei)/me)))/8.))/(me*sigT*(4*me + (2*Ei**2*(Ei + me))/(2*Ei + me)**2 - (4*me*(Ei + me)*np.arctanh(Ei/(Ei + me)))/Ei + Ei*np.log(1 + (2*Ei)/me))))
+
 def XODE(Ei,a):
     Eps=nh0/(a**3)*c*((3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2))
     return -(Ei+Eps*a**(3/2.)/(sqrtomegaM*H0))
+
+def XODEsignewt(Ei,a, X, h,pm):
+    thisstd=stddeveps(Ei,a)*sigthet(Ei)*nh0*a**(-3.)*c
+    return Ei+h*(Ei+(eps(Ei,a)+pm*thisstd)*a**(3/2.)/(sqrtomegaM*H0))-X
+
+def pXODEsignewt(Ei,a, X, h,pm):
+    thisstd=(stddevdeps(Ei,a)*sigthet(Ei)+stddeveps(Ei,a)*dsigthet(Ei))*nh0*a**(-3.)*c
+    return 1+h*(1+deps(Ei,a)+(pm*thisstd)*a**(3/2.)/(sqrtomegaM*H0))
 
 def XODEnewt(Ei,a, X, h):
     return Ei-h*XODE(Ei,a)-X
@@ -34,7 +61,7 @@ def pXODEnewt(Ei,a, X, h):
     return 1+h+h*deps(Ei,a)
 
 def imptstep(f,fp, *args):
-    return optimize.newton(f,args[1],fprime=fp,args=args)
+    return optimize.newton(f,args[1],fprime=fp,args=args,disp=False)
 
 
 #CONSTANTS
@@ -133,18 +160,31 @@ for zcol in range(2):
             zEdic['z%s_E%s' % (zi,Ei)]=[1/(1+zi),Ei*me]
 
 
-Na=100000
-Elist=np.array([5])*me
-a=1/1301.
+with open('/Users/Acolyte/NYU/Research/rad_trans/xodestd_E5_z1300.pkl') as f:
+    Xstep=pickle.load(f)
+    Xstepp=pickle.load(f)
+    Xstepm=pickle.load(f)
+
+Na=10000
+Elist=np.array(Eread1[0])*me
+a=1/(np.array(zread1[0])+1.)
 afinal=1/51.
 dlna=np.abs((np.log(afinal)-np.log(a))/np.float(Na))
 adisc=np.exp(np.linspace(np.log(a),np.log(afinal),Na))
 # for Eit in Elist:
 #     print(Eit/me)
 #     Xstep=np.zeros(Na)
+#     Xstepp=np.zeros(Na)
+#     Xstepm=np.zeros(Na)
 #     Xstep[0]=Eit
+#     Xstepp[0]=Eit
+#     Xstepm[0]=Eit
 #     for ev in (np.arange(Na-1)+1):
 #         Xstep[ev]=imptstep(XODEnewt,pXODEnewt,adisc[ev],Xstep[ev-1],dlna)
+#         Xstepp[ev]=imptstep(XODEsignewt,pXODEsignewt,adisc[ev],Xstepp[ev-1],dlna,1.)
+#         Xstepm[ev]=imptstep(XODEsignewt,pXODEsignewt,adisc[ev],Xstepm[ev-1],dlna,-1.)
+#         if not ev%1000:
+#             print ev
 
             
 # fol='/Users/Acolyte/NYU/Research/rad_trans/analytic/'
@@ -154,9 +194,16 @@ adisc=np.exp(np.linspace(np.log(a),np.log(afinal),Na))
 
 ode=Xstep
 fig,ax=plt.subplots(1,1)
-ax.plot(1/adisc-1,ode*adisc,lw=4,color=purple,zorder=1,label=r'$E(t,z_{\rm inj}=1300,E_{\rm inj}=5 m_E)$')
-for i in range(200):
-    ax.plot(1/mastera[i]-1,masterE[i]*mastera[i],lw=0.5,color=orange,zorder=0)
+ax.plot(1/adisc-1,ode*adisc,lw=4,color=purple,zorder=1,label=r'$E(t,z_{\rm inj}=%s,E_{\rm inj}=%s m_E)$' % (zread1[0],Eread1[0]))
+ax.plot(1/adisc-1,Xstepp*adisc,lw=4,color=purple,zorder=1,linestyle='--')
+ax.plot(1/adisc-1,Xstepm*adisc,lw=4,color=purple,zorder=1,linestyle='--')
+for i in np.arange(500)+2000:
+    pltE=np.repeat(masterE[i],2)[:-2]
+    plta=np.repeat(mastera[i],2)
+    ax.plot(1/plta[1:-1]-1,pltE*plta[:-2],lw=0.5,color=orange,zorder=0)
+
+
+
 ax.plot(None,None,lw=3,color=orange,zorder=0, label='Simulation')
 ax.set_yscale('log')
 ax.legend(fontsize=18)
@@ -164,9 +211,6 @@ ax.invert_xaxis()
 ax.set_ylabel('aE (eV)',fontsize=20)
 ax.set_xlabel('z',fontsize=20)
 ax.tick_params(axis='both', which='major', labelsize=16)
-plt.savefig('Etraj.pdf')
+plt.savefig('Etraj_std_E%s_z%s.pdf' % (Eread1[0],zread1[0]))
 plt.show()
-
-
-
 
