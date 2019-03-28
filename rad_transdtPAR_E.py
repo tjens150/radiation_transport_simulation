@@ -126,6 +126,11 @@ nh0=8.6*0.022
 H0=2.197*10**(-18)
 omegaM=0.308
 #CONSTANTS
+
+#COEFFICIENCTS FOR EFFICIENCY
+ptmpco=c*nh0/(np.sqrt(omegaM)*H0)
+Lstepco=c*2/(H0*np.sqrt(omegaM))    
+#COEFFICIENCTS FOR EFFICIENCY
     
 comm = MPI.COMM_WORLD
 
@@ -176,7 +181,7 @@ for astart in alist:
             rot=1.
             while 1/ai-1 > zfinal:
                 astep=np.copy(ai)
-                ptmp=nh0/(astep**(3/2.)*np.sqrt(omegaM)*H0)*c*cross(Eistep)
+                ptmp=ptmpco*cross(Eistep)/astep**(3/2.)
                 dlna=np.min([0.001/ptmp,0.001])
                 pxstep=ptmp*dlna
                 ppull=np.random.uniform(0,1)
@@ -186,31 +191,30 @@ for astart in alist:
                     astep=astep*(1+dlna)
                     if 1/astep-1 < zfinal:
                         break
-                    ptmp=nh0/(astep**(3/2.)*np.sqrt(omegaM)*H0)*c*cross(Eistep)
+                    ptmp=ptmpco*cross(Eistep)/astep**(3/2.)
                     dlna=np.min([0.001/ptmp,0.001])
                     pxstep=ptmp*dlna
                 if 1/astep-1 < zfinal:
                     warning = 1
-                    #ax.plot(np.array(xlist)/mpc,np.array(ylist)/mpc,marker='^',markersize=2,lw=1,color=red)
                     break
-                Lstep=(2/(H0*np.sqrt(omegaM))*(astep**(1/2.)-ai**(1/2.)))*c    
-                vec=[[np.sin(thetastep)*np.cos(phistep)*Lstep],
-                     [np.sin(thetastep)*np.sin(phistep)*Lstep],
-                     [np.cos(thetastep)*Lstep]]
+                Lstep=Lstepco*(astep**(1/2.)-ai**(1/2.))
+                sth=np.sin(thetastep)
+                cth=np.cos(thetastep)
+                vec=[[sth*np.cos(phistep)*Lstep],
+                     [sth*np.sin(phistep)*Lstep],
+                     [cth*Lstep]]
                 #this vector is v.Rz_1.Ry_1.Rz_2.Ry_2...->v.rot Thus I need to apply the reverse to get v, the desired vector in my original coordinate system
-                xlist.append(np.dot(rot,vec)[0]+xlist[-1])
-                ylist.append(np.dot(rot,vec)[1]+ylist[-1])
-                zlist.append(np.dot(rot,vec)[2]+zlist[-1])
+                dotvec=np.dot(rot,vec)
+                xlist.append(dotvec[0]+xlist[-1])
+                ylist.append(dotvec[1]+ylist[-1])
+                zlist.append(dotvec[2]+zlist[-1])
 
                 phistep=np.random.uniform(0,2*pi)
                 thetastep=np.arccos(rej(-1,1,pdfthet,maxPT,Eistep))
-                Efstep=1/(2/me*np.sin(thetastep/2.)**2+1/Eistep)
-                if Efstep > Eistep:
-                    pdb.set_trace()
-                
+                Efstep=1/(2/me*np.sin(thetastep/2.)**2+1/Eistep)                
                 rot=np.dot(rot,rotmat(thetastep,phistep))
                 Eistep=Efstep#*ai/astep
-                ai=np.copy(astep)
+                ai=astep
                 Elist.append(Eistep)
                 alist.append(astep)
                 count+=1
