@@ -99,11 +99,15 @@ def simp_rule(N, a, b, f, *args):
     arrodd=h*np.arange(1,N,2)
     return (1/3.)*h*(f(a, *args)+f(b,*args)+4*f(arrodd+a,*args).sum()+2*f(arreven+a,*args).sum())
 
-def rotmat(thet,phi):
-    return [[np.cos(phi)*np.cos(thet),-np.sin(phi)*np.cos(thet),np.sin(thet)],
-            [np.sin(phi),np.cos(phi),0],
-            [np.sin(thet)*np.cos(phi),np.sin(phi)*np.sin(thet),np.cos(thet)]]
-    
+# def rotmat(thet,phi):
+#     return [[np.cos(phi)*np.cos(thet),-np.sin(phi)*np.cos(thet),np.sin(thet)],
+#             [np.sin(phi),np.cos(phi),0],
+#             [np.sin(thet)*np.cos(phi),np.sin(phi)*np.sin(thet),np.cos(thet)]]
+def rotmat(thet,phi): #corrected maybe FINALLY???
+    return [[np.cos(phi)*np.cos(thet),-np.sin(phi),np.sin(thet)*np.cos(phi)],
+            [np.cos(thet)*np.sin(phi),np.cos(phi),np.sin(phi)*np.sin(thet)],
+            [-np.sin(thet),0,np.cos(thet)]]
+
 
 
 #if __name__ =="__main__":
