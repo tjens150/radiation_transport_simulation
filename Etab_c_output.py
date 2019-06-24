@@ -17,15 +17,18 @@ green=(103/255,191/255,92/255)
 red=(237/255,102/255,93/255)
 purple=(173/255,139/255,201/255)
 
+def HubbleRate(a):
+    return H0*np.sqrt(omegaM/a**3+omegaK/a**2+omegaDE+omegaR/a**4)
+
 def XODE(Ei,a):
     Eps=nh0/(a**3)*c*((3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2))
-    return -(Ei+Eps*a**(3/2.)/(sqrtomegaM*H0))
+    return -(Ei+Eps/HubbleRate(a))
 
 def XODEnewt(Ei,a, X, h):
     return Ei-h*XODE(Ei,a)-X
 
 def deps(Ei,a):
-    return 1/(H0*np.sqrt(omegaM)*a**(3/2.))*nh0*c*((3*me*sigT*((2*Ei*(-40*Ei**3 + 153*Ei**2*me + 186*Ei*me**2 + 51*me**3))/(3.*(2*Ei + me)**3) - (4*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(2*Ei + me)**4 + (2*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + (2*(Ei - 3*me)*(Ei + me)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(1 - Ei**2/(Ei + me)**2) + 2*(Ei - 3*me)*np.arctanh(Ei/(Ei + me)) + 2*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2) - (3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(4.*Ei**3))
+    return 1/(HubbleRate(a)*a**(3.))*nh0*c*((3*me*sigT*((2*Ei*(-40*Ei**3 + 153*Ei**2*me + 186*Ei*me**2 + 51*me**3))/(3.*(2*Ei + me)**3) - (4*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(2*Ei + me)**4 + (2*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + (2*(Ei - 3*me)*(Ei + me)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(1 - Ei**2/(Ei + me)**2) + 2*(Ei - 3*me)*np.arctanh(Ei/(Ei + me)) + 2*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2) - (3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(4.*Ei**3))
 
 def pXODEnewt(Ei,a, X, h):
     return 1+h+h*deps(Ei,a)
@@ -41,7 +44,7 @@ def meanLsq(xode,aarr):
     crossiter=cross(xode)
     ai=aarr[0]
     def tmpf(aint):
-        return c*aint**(3/2.)/(sqrtomegaM*H0*nh0)
+        return c/(HubbleRate(aint)*nh0)
     fint=tmpf(aarr)/crossiter
     for i in range(iso.size):
         finttmp=fint[0:i+1]
@@ -59,7 +62,13 @@ mpc=3.086*10**22
 sigT=6.652459*10**(-29.)
 nh0=8.6*0.022
 H0=2.197*10**(-18)
+h=0.7
+T0=2.73
+Nnueff=3.046
 omegaM=0.308
+omegaR=T0**4*4.48162687719e-7*(1+0.227107318*Nnueff)/h**2
+omegaK=0.
+omegaDE=1-omegaM-omegaR-omegaK
 sqrtomegaM=np.sqrt(omegaM)
 #CONSTANTS
 
@@ -67,7 +76,7 @@ sqrtomegaM=np.sqrt(omegaM)
 zmax=1300.
 zmin=1.
 zres=np.flip(np.arange(zmin,zmax+1,1.))
-ainj=np.exp(np.arange(np.log(1/(zmax+1.)),np.log(1/51.),0.001))
+ainj=np.exp(np.arange(np.log(1/(zmax+1.)),np.log(1/51.),0.01))
 afinal=1/51.
 Na=len(ainj)
 Nz=len(zres)
