@@ -1,7 +1,7 @@
 from __future__ import division
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+# import matplotlib.pyplot as plt
+# import matplotlib.cm as cm
 import pdb as pdb
 from math import pi
 import pickle as pickle
@@ -147,14 +147,14 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-Eim=[10,5,1]
+Eim=[5]
 # divy=int(size/len(Eilist))
 # if size == 1:
 #     divy=1
 # surplus=size-(divy*len(Eilist))
 # if size != 1:
 #     assert not surplus
-Ntot=800000
+Ntot=600000
 N=int(Ntot / size)
 # Eim=[Eilist[rank % len(Eilist)]]
 # color= rank % len(Eilist)
@@ -163,7 +163,8 @@ N=int(Ntot / size)
 # comm.Barrier()
 
 astep=0.1
-alogbins=np.arange(np.log(astart),np.log(afinal),astep)
+astart=1/1301.
+alogbins=np.arange(np.log(astart),np.log(1/(zfinal+1)),astep)
 #Ebins=np.linspace(me*Emax,me*Emin,nEbins)
 #Ebins=[15*me,10*me,5*me, 1.1*me,0.11*me,0.05*me]
 abins=np.exp(alogbins)
@@ -215,10 +216,10 @@ for astart in alist:
                      [sth*np.sin(phistep)*Lstep],
                      [cth*Lstep]]
                 #this vector is v.Rz_1.Ry_1.Rz_2.Ry_2...->v.rot Thus I need to apply the reverse to get v, the desired vector in my original coordinate system
-                dotvec=np.dot(rot,vec)
-                xlist.append(dotvec[0]+xlist[-1])
-                ylist.append(dotvec[1]+ylist[-1])
-                zlist.append(dotvec[2]+zlist[-1])
+                dotvec=np.dot(rot,vec).flatten()
+                xlist.append((dotvec[0]+xlist[-1]))
+                ylist.append((dotvec[1]+ylist[-1]))
+                zlist.append((dotvec[2]+zlist[-1]))
 
                 phistep=np.random.uniform(0,2*pi)
                 thetastep=np.arccos(rej(-1,1,pdfthet,maxPT,Eistep))
@@ -236,7 +237,7 @@ for astart in alist:
             aph=np.array(alist)
             dEph=np.array(dElist)
             zaph=1/aph-1
-            newE=np.array(Elist)[:1]
+            newE=np.array(Elist)[:-1]
 
             photcount+=np.array(binned_statistic_2d(newr,aph,np.ones_like(newr,dtype='int'),statistic='sum', bins=[rbins,abins])[0])
             result[:,:,0]+=np.array(binned_statistic_2d(newr,aph,dEph,statistic='sum', bins=[rbins,abins])[0])
@@ -300,11 +301,11 @@ for astart in alist:
             # mastera=[np.asarray(item,dtype=float) for sublist in mastera for item in sublist]
             # masterE=[np.asarray(item,dtype=float) for sublist in masterE for item in sublist]
             mphotcount=np.zeros(np.shape(photcount[0]))
-            mresult=np.zeros(np.shape(photcount[0]))
-            masum=np.zeros(np.shape(photcount[0]))
-            mzsum=np.zeros(np.shape(photcount[0]))
-            mrsum=np.zeros(np.shape(photcount[0]))
-            mEsum=np.zeros(np.shape(photcount[0]))
+            mresult=np.zeros(np.shape(result[0]))
+            masum=np.zeros(np.shape(result[0]))
+            mzsum=np.zeros(np.shape(result[0]))
+            mrsum=np.zeros(np.shape(result[0]))
+            mEsum=np.zeros(np.shape(result[0]))
             for ss in range(len(photcount)):
                 mphotcount+=photcount[ss]
                 mresult+=result[ss]
@@ -312,7 +313,7 @@ for astart in alist:
                 mzsum+=zsum[ss]
                 mrsum+=rsum[ss]
                 mEsum+=Esum[ss]
-            tit='z'+str(int(1/astart-1))+'_'+'E'+str(Eim[ee])+'_'+str(Ntot)+'binned'
+            tit='z'+str(int(1/astart-1))+'_'+'E'+str(Eim[ee])+'_N'+str(Ntot)+'_binned'
             fil=tit+'.pkl'
             tit=tit+'.pdf'
             with open('./pickle/'+fil, "wb") as f:
