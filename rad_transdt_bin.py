@@ -154,7 +154,7 @@ Eim=[5]
 # surplus=size-(divy*len(Eilist))
 # if size != 1:
 #     assert not surplus
-Ntot=600000
+Ntot=5e5
 N=int(Ntot / size)
 # Eim=[Eilist[rank % len(Eilist)]]
 # color= rank % len(Eilist)
@@ -170,7 +170,7 @@ alogbins=np.arange(np.log(astart),np.log(1/(zfinal+1)),astep)
 abins=np.exp(alogbins)
 
 nrbins=70
-logr=np.linspace(np.log(20),np.log(600),nrbins)
+logr=np.linspace(np.log(1),np.log(600),nrbins)
 rbins=np.insert(np.exp(logr),0,0)
 rbins=np.append(rbins,100000)
 
@@ -186,6 +186,7 @@ for astart in alist:
         zsum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
         rsum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
         Esum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
+        Nscatter=np.zeros([len(rbins)-1,len(alogbins)-1,2])
         for i in range(N):
             phistep=np.random.uniform(0,2*pi)
             thetastep=np.random.uniform(0,pi)
@@ -250,6 +251,9 @@ for astart in alist:
             zsum[:,:,1]+=np.array(binned_statistic_2d(newr,aph,zaph*zaph,statistic='sum', bins=[rbins,abins])[0])
             rsum[:,:,1]+=np.array(binned_statistic_2d(newr,aph,newr*newr,statistic='sum', bins=[rbins,abins])[0])
             Esum[:,:,1]+=np.array(binned_statistic_2d(newr[1:],aph[1:],newE*newE,statistic='sum', bins=[rbins,abins])[0])
+            Nscatter[:,:,0]+=np.array(binned_statistic_2d([newr[1]],[aph[1]],[1],statistic='sum', bins=[rbins,abins])[0])
+            Nscatter[:,:,1]+=np.array(binned_statistic_2d([newr[2]],[aph[2]],[1],statistic='sum', bins=[rbins,abins])[0])
+            
             
             # masterx.append(np.array(xlist)/mpc)
             # mastery.append(np.array(ylist)/mpc)
@@ -284,6 +288,7 @@ for astart in alist:
         zsum=comm.gather(zsum,root=0)
         rsum=comm.gather(rsum,root=0)
         Esum=comm.gather(Esum,root=0)
+        Nscatter=comm.gather(Nscatter,root=0)
         # masterx=newcomm.gather(masterx,root=0)
         # mastery=newcomm.gather(mastery,root=0)
         # masterz=newcomm.gather(masterz,root=0)
@@ -306,6 +311,7 @@ for astart in alist:
             mzsum=np.zeros(np.shape(result[0]))
             mrsum=np.zeros(np.shape(result[0]))
             mEsum=np.zeros(np.shape(result[0]))
+            mNscatter=np.zeros(np.shape(Nscatter[0]))
             for ss in range(len(photcount)):
                 mphotcount+=photcount[ss]
                 mresult+=result[ss]
@@ -313,6 +319,7 @@ for astart in alist:
                 mzsum+=zsum[ss]
                 mrsum+=rsum[ss]
                 mEsum+=Esum[ss]
+                mNscatter+=Nscatter[ss]
             tit='z'+str(int(1/astart-1))+'_'+'E'+str(Eim[ee])+'_N'+str(Ntot)+'_binned'
             fil=tit+'.pkl'
             tit=tit+'.pdf'
@@ -323,6 +330,7 @@ for astart in alist:
                 pickle.dump(mzsum,f)
                 pickle.dump(mrsum,f)
                 pickle.dump(mEsum,f)
+                pickle.dump(mNscatter,f)
             #with open(fil,"rb") as f:
             #Rlist=pickle.load(f)
             #afarr=pickle.load(f)
