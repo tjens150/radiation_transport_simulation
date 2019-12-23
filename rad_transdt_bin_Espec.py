@@ -156,7 +156,7 @@ Eim=[0.1]
 # surplus=size-(divy*len(Eilist))
 # if size != 1:
 #     assert not surplus
-Ntot=100
+Ntot=100000
 N=int(Ntot / size)
 # Eim=[Eilist[rank % len(Eilist)]]
 # color= rank % len(Eilist)
@@ -192,16 +192,15 @@ Tf=interpolate.interp1d(np.log(1/(1+zarr)),Tfarr,kind='cubic')
 for astart in alistiter:
     Ecut=Tf(np.log(astart))
     Ebins=np.linspace(Emin,Ecut,nEbins)
+    result=np.zeros([len(rbins)-1,len(alogbins)-1,2])
+    photcount=np.zeros([len(rbins)-1,len(alogbins)-1])
+    asum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
+    zsum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
+    rsum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
+    Esum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
+
     for ee in range(len(Ebins)):
         Ei=Ebins[ee]*me
-        afarr=np.zeros(N)
-        Narr=np.zeros(N, dtype=int)
-        result=np.zeros([len(rbins)-1,len(alogbins)-1,2])
-        photcount=np.zeros([len(rbins)-1,len(alogbins)-1])
-        asum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
-        zsum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
-        rsum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
-        Esum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
         for i in range(N):
             phistep=np.random.uniform(0,2*pi)
             thetastep=np.random.uniform(0,pi)
