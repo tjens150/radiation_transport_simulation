@@ -188,8 +188,8 @@ for astart in alistiter:
     zmean=(zdist[:,:,0].sum(axis=0))/nphotbin.sum(axis=0)
     amean=(adist[:,:,0].sum(axis=0))/nphotbin.sum(axis=0)
    # rmean=(rdist[:,:,0].sum(axis=0))/nphotbin.sum(axis=0)
-    denom=np.einsum('i,j->ij',dR,dt*(amean/a)**(3))
-    Na=10000
+    denom=np.einsum('i,j->ij',dR,dt*(amean/a)**3)
+    Na=5000
     dlna=np.abs((np.log(afinal)-np.log(a))/np.float(Na))
         
     adisc=np.exp(np.linspace(np.log(a),np.log(afinal),Na))
@@ -205,13 +205,13 @@ for astart in alistiter:
         for ev in (np.arange(Na-1)+1):
             Xstep[ev]=imptstep(XODEnewt,pXODEnewt,adisc[ev],Xstep[ev-1],dlna)
             
-        print('Finished PDE solver.')
-        print('PDE took: %s seconds' % (time.time()-ttot))
         if (ee == 0) or (ee == len(Ebins)-1):
             NEWODE+=newG(adisc,Xstep,E)/2.
         else:
             NEWODE+=newG(adisc,Xstep,E)
         NEWODE=dE*NEWODE/Ecut
+    print('Finished PDE solver.')
+    print('%s PDEs took: %s seconds' % (len(Ebins),time.time()-ttot))
     if zwh[0]-1 > -1:
         # zwhmod=np.insert(zwh,0,zwh[0]-1)  amean[zwh[0]-1]
         tmpdenom=np.insert(denom,zwh[0],dR*(amean[zwh[0]-1]/a)**3*dtfunc(a,alin[zwh[0]]),axis=1)#2/3.*(a32[zwh[0]]-a**(3/2.))/(H0*np.sqrt(omegaM)),axis=1)
@@ -221,7 +221,7 @@ for astart in alistiter:
         tmpdenom=denom
         #for nam in ['z1266_E0.11']:
     G=ardep[:,:,0]/tmpdenom
-    Gt=spacialint(G,dR,dt)*Ecut#/(Etot*HubbleRate(a))#*7.8e-5
+    Gt=spacialint(G,dR,dt)*dE/(Etot*me)/(HubbleRate(a))#*8.831793880834816e-14#*7.8e-5
     #Gt=spacialint(G,pi*(rbins[1:]**4-rbins[:-1]**4),dt)*Ecut/Etot
     #pdb.set_trace()
     if Ecut/me <0.2:
@@ -252,11 +252,12 @@ for astart in alistiter:
     #pdb.set_trace()
 
 
-    #test=find_nearest(adisc, amean[zwh[0]])
+    test=find_nearest(adisc, amean[zwh[0]])
     #pdb.set_trace()
     #*NEWODE[test]/Gt[zwh[0]]
     ax.scatter(zmean[zwh],Gt[zwh],s=12,zorder=3)
-
+    print(NEWODE[test]/Gt[zwh[0]])
+    #pdb.set_trace()
     # cbar=plt.colorbar(sc)
     # cbar.set_label(r'$E_{{\rm mean}}$/$m_e$',fontsize=18)
     # err=np.sqrt(zdist[:,:,1].sum(axis=0)/nphotbin.sum(axis=0)-zmean*zmean)
@@ -271,7 +272,7 @@ for astart in alistiter:
     ax.legend(fontsize=18,loc='lower right')
 
     ax.set_xlabel('z',fontsize=20)
-    ax.set_ylabel(r'G (s$^{-1}$)',fontsize=20)
+    ax.set_ylabel(r"G(a,a')",fontsize=20)
     ax.tick_params(axis='both', which='major', labelsize=16)
     ax.set_title(r'$E_{\rm cut}=$%s $(m_e)$, $z_{\rm inj}=$%s, $N_\gamma=$%s' % (int(Ecut*10)/10., int(1/a-1), nphot), fontsize=18)
     fig.tight_layout()
