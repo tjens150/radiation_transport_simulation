@@ -156,7 +156,7 @@ Eim=[0.1]
 # surplus=size-(divy*len(Eilist))
 # if size != 1:
 #     assert not surplus
-Ntot=100000
+Ntot=200000
 N=int(Ntot / size)
 # Eim=[Eilist[rank % len(Eilist)]]
 # color= rank % len(Eilist)
@@ -165,8 +165,8 @@ N=int(Ntot / size)
 # comm.Barrier()
 
 astep=0.1
-aliststep=0.05
-astartb=1/1301.
+aliststep=0.1
+astartb=1/1501.
 alogbins=np.arange(np.log(astartb),np.log(1/(zfinal+1)),astep)
 #Ebins=np.linspace(me*Emax,me*Emin,nEbins)
 #Ebins=[15*me,10*me,5*me, 1.1*me,0.11*me,0.05*me]
@@ -175,22 +175,23 @@ alistiter=np.exp(np.arange(np.log(astartb),np.log(1/(zfinal+50)),aliststep))
 
 
 nrbins=70
-logr=np.linspace(np.log(20),np.log(600),nrbins)
+logr=np.linspace(np.log(1),np.log(600),nrbins) #before the lower-bound was np.log(20)
 rbins=np.insert(np.exp(logr),0,0)
 rbins=np.append(rbins,100000)
 
 Emin=0.01
 nEbins=20
 
-mbh=100
-T_file='PBH_MBH_%s_T_novbc.dat' % (mbh)
+mbh=10
+T_file='PBH_MBH_%s_L_T.dat' % (mbh)
 ldf=np.loadtxt(T_file)
-Tfarr=ldf[:-1,-1]
+Tfarr=ldf[:-1,3]
 zarr=ldf[:-1,0]
 Tf=interpolate.interp1d(np.log(1/(1+zarr)),Tfarr,kind='cubic')
+pikfol='mbh10_rmin1_ainjstep0.1/'
 
 for astart in alistiter:
-    Ecut=Tf(np.log(astart))
+    Ecut=Tf(np.log(astart))#~.447 asymptote
     Ebins=np.linspace(Emin,Ecut,nEbins)
     result=np.zeros([len(rbins)-1,len(alogbins)-1,2])
     photcount=np.zeros([len(rbins)-1,len(alogbins)-1])
@@ -248,6 +249,8 @@ for astart in alistiter:
                 count+=1
             # afarr[i]=1/ai-1
             # Narr[i]=count
+            if len(xlist) < 2:
+                break
             newr=np.sqrt(np.array(xlist)**2+np.array(ylist)**2+np.array(zlist)**2)/mpc
             aph=np.array(alist)
             dEph=np.array(dElist)
@@ -333,7 +336,7 @@ for astart in alistiter:
         print(Ecut)
         fil=tit+'.pkl'
         tit=tit+'.pdf'
-        with open('./pickle/'+fil, "wb") as f:
+        with open('./pickle/'+pikfol+fil, "wb") as f:
             pickle.dump(mphotcount,f)
             pickle.dump(mresult,f)
             pickle.dump(masum,f)
