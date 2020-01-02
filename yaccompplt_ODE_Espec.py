@@ -27,23 +27,15 @@ def spacialint(g,dR,dt):
     diff=np.repeat(dR[:,np.newaxis],dt.shape[0],axis=1)
     return (g*diff).sum(axis=0)
 
-def yacine(ainj,astart,Erat):
-    aarr=np.linspace(afinal,ainj,10000)
-    expo=np.exp(c/Erat*sigT*nh0/(H0*np.sqrt(omegaM))*2/3*(aarr**(-3/2.)-ainj**(-3/2)))
-    return expo*(ainj**4/aarr**7)*nh0*c*sigT/Erat,aarr
-
-def diffcross(Ei, Ef):
-    return (3/8.)*sigT*me/(Ei*Ei)*(Ef/Ei+Ei/Ef-1+(1+me/Ei-me/Ef)**2)
-
 def eps(Ei,a):
     return a**(-3.)*nh0*c*((3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2))
 
 def deps(Ei,a):
-    return 1/(H0*sqrtomegaM*a**(3/2.))*nh0*c*((3*me*sigT*((2*Ei*(-40*Ei**3 + 153*Ei**2*me + 186*Ei*me**2 + 51*me**3))/(3.*(2*Ei + me)**3) - (4*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(2*Ei + me)**4 + (2*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + (2*(Ei - 3*me)*(Ei + me)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(1 - Ei**2/(Ei + me)**2) + 2*(Ei - 3*me)*np.arctanh(Ei/(Ei + me)) + 2*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2) - (3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(4.*Ei**3))
+    return 1/(HubbleRate(a)*a**3)*nh0*c*((3*me*sigT*((2*Ei*(-40*Ei**3 + 153*Ei**2*me + 186*Ei*me**2 + 51*me**3))/(3.*(2*Ei + me)**3) - (4*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(2*Ei + me)**4 + (2*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + (2*(Ei - 3*me)*(Ei + me)*(-(Ei/(Ei + me)**2) + 1/(Ei + me)))/(1 - Ei**2/(Ei + me)**2) + 2*(Ei - 3*me)*np.arctanh(Ei/(Ei + me)) + 2*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2) - (3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(4.*Ei**3))
 
 def XODE(Ei,a):
     Eps=nh0/(a**3)*c*((3*me*sigT*((2*Ei*(-10*Ei**4 + 51*Ei**3*me + 93*Ei**2*me**2 + 51*Ei*me**3 + 9*me**4))/(3.*(2*Ei + me)**3) + 2*(Ei - 3*me)*(Ei + me)*np.arctanh(Ei/(Ei + me))))/(8.*Ei**2))
-    return -(Ei+Eps*a**(3/2.)/(sqrtomegaM*H0))
+    return -(Ei+Eps/HubbleRate(a))
 
 def XODEnewt(Ei,a, X, h):
     return Ei-h*XODE(Ei,a)-X
@@ -51,30 +43,9 @@ def XODEnewt(Ei,a, X, h):
 def pXODEnewt(Ei,a, X, h):
     return 1+h+h*deps(Ei,a)
 
-def XODEtest(Ei,a,X,h):
-    tmpeps=-(Ei+nh0*a**(-3.)*c*0.1*sigT*Ei*(a**(3/2.)/(sqrtomegaM*H0)))
-    return Ei-h*tmpeps-X
-
-def pXODEtest(Ei,a,X,h):
-    tmpeps=-(1+nh0*a**(-3.)*c*0.1*sigT*(a**(3/2.)/(sqrtomegaM*H0)))
-    return 1-h*tmpeps
-
 def imptstep(f,fp, *args):
     return optimize.newton(f,args[1],fprime=fp,args=args)
 
-def ODEG(adisc,XODEval,E0,dlna):
-    #exp=deps(XODEval,adisc)/adisc
-    expt=(nh0*c*0.1*sigT/(sqrtomegaM*H0))*2/3.*(adisc[0]**(-3/2.)-adisc**(-3/2.))
-    # exp=(nh0/adisc**3*c*0.1*sigT*(adisc**3/2/(sqrtomegaM*H0)))/adisc
-    nsize=adisc.size
-    expint=np.zeros(nsize)
-    tmpeps=nh0*adisc**(-3.)*c*0.1*sigT*XODEval
-    # for i in np.arange(nsize-1)+1:
-    #     expint[i]=((exp[:(i-nsize)]+exp[1:(i+1)])*dlna*adisc[1:(i+1)]).sum()/2
-    # pdb.set_trace()
-    # return np.exp(expint)*(adisc[0]/adisc)**2*eps(XODEval,adisc)/XODEval
-    expint=expt
-    return np.exp(expint)*(adisc[0]/adisc)**2*tmpeps/XODEval
 def newG(adisc,XODEval,E0):
     return (adisc[0]/adisc)**3*eps(XODEval,adisc)/(E0*HubbleRate(adisc[0]))
 
@@ -115,7 +86,7 @@ aeq=4.15e-5/(omegaM*h**2)
 
 
 folsav='/home/data/tj796/Research/radtrans/figures/temporal_Espec/'
-fol='/home/data/tj796/Research/radtrans/pickle/'
+fol='/home/data/tj796/Research/radtrans/pickle/mbh100_rmin20_ainjstep0.05/'
 
 nrbins=70
 logr=np.linspace(np.log(20),np.log(600),nrbins)
@@ -235,7 +206,6 @@ for astart in alistiter:
         ticks=[np.log10(5),np.log10(3),np.log10(1),np.log10(0.1),np.log10(0.05),np.log10(0.01)]
         ticknames=[5,3,1,0.1,0.05,0.01]
 
-    #Gty,aarr=yacine(a,astart,Erat)
     
     zplot=(zbins[1:]+zbins[:-1])/2
     zwh=np.where(zplot <= 1/a-1)[0]
