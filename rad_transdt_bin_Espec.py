@@ -156,7 +156,7 @@ Eim=[0.1]
 # surplus=size-(divy*len(Eilist))
 # if size != 1:
 #     assert not surplus
-Ntot=200000
+Ntot=200000*20
 N=int(Ntot / size)
 # Eim=[Eilist[rank % len(Eilist)]]
 # color= rank % len(Eilist)
@@ -190,9 +190,12 @@ zarr=ldf[:-1,0]
 Tf=interpolate.interp1d(np.log(1/(1+zarr)),Tfarr,kind='cubic')
 pikfol='mbh10_rmin1_ainjstep0.1/'
 
+Ecut=.447
+Eeps=0.045 #2pi*finestructure*me is when bohr radius is comparable to photon wavelength
+Ebins=[1]
 for astart in alistiter:
-    Ecut=Tf(np.log(astart))#~.447 asymptote
-    Ebins=np.linspace(Emin,Ecut,nEbins)
+    #Ecut=Tf(np.log(astart))#~.447 asymptote
+#    Ebins=np.linspace(Emin,Ecut,nEbins)
     result=np.zeros([len(rbins)-1,len(alogbins)-1,2])
     photcount=np.zeros([len(rbins)-1,len(alogbins)-1])
     asum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
@@ -201,8 +204,11 @@ for astart in alistiter:
     Esum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
 
     for ee in range(len(Ebins)):
-        Ei=Ebins[ee]*me
+#        Ei=Ebins[ee]
+#        overflowcut=0.0001*me
         for i in range(N):
+            samp=np.random.uniform()
+            Ei=Ecut**samp/Eeps**(samp-1)*me
             phistep=np.random.uniform(0,2*pi)
             thetastep=np.random.uniform(0,pi)
             xlist=[0]
