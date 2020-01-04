@@ -177,10 +177,10 @@ for astart in alistiter:
             Xstep[ev]=imptstep(XODEnewt,pXODEnewt,adisc[ev],Xstep[ev-1],dlna)
             
         if (ee == 0) or (ee == len(Ebins)-1):
-            NEWODE+=newG(adisc,Xstep,E)/2.
+            NEWODE+=newG(adisc,Xstep,E)*E/2.
         else:
-            NEWODE+=newG(adisc,Xstep,E)
-        NEWODE=dE*NEWODE/Ecut
+            NEWODE+=newG(adisc,Xstep,E)*E
+        NEWODE=dE*NEWODE/(Ecut*Ebins.sum()*me)
     print('Finished PDE solver.')
     print('%s PDEs took: %s seconds' % (len(Ebins),time.time()-ttot))
     if zwh[0]-1 > -1:
@@ -192,7 +192,7 @@ for astart in alistiter:
         tmpdenom=denom
         #for nam in ['z1266_E0.11']:
     G=ardep[:,:,0]/tmpdenom
-    Gt=spacialint(G,dR,dt)*dE/(Etot*me)/(HubbleRate(a))#*8.831793880834816e-14#*7.8e-5
+    Gt=spacialint(G,dR,dt)*dE/(Ecut*Etot*me)/(HubbleRate(a))#*8.831793880834816e-14#*7.8e-5
     #Gt=spacialint(G,pi*(rbins[1:]**4-rbins[:-1]**4),dt)*Ecut/Etot
     #pdb.set_trace()
     if Ecut/me <0.2:
@@ -249,7 +249,7 @@ for astart in alistiter:
 #    plt.savefig(folsav+nam+'.pdf')
 
     #ax.plot(1/adisc-1,GODE,lw=2,color=green,zorder=1)
-    plt.savefig(folsav+'log/'+nam+'.pdf')
+    plt.savefig(folsav+'log/'+nam+'test.pdf')
 
     plt.close(fig)
 #plt.show()
