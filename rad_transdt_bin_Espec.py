@@ -202,7 +202,7 @@ for astart in alistiter:
     zsum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
     rsum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
     Esum=np.zeros([len(rbins)-1,len(alogbins)-1,2])
-
+    Etot=0.
     for ee in range(len(Ebins)):
 #        Ei=Ebins[ee]
 #        overflowcut=0.0001*me
@@ -257,9 +257,10 @@ for astart in alistiter:
             # Narr[i]=count
             if len(xlist) < 2:
                 break
-            newr=np.sqrt(np.array(xlist)**2+np.array(ylist)**2+np.array(zlist)**2)/mpc
-            aph=np.array(alist)
-            dEph=np.array(dElist)
+            Etot+=Ei
+            newr=(np.sqrt(np.array(xlist)**2+np.array(ylist)**2+np.array(zlist)**2)/mpc)[1:]
+            aph=np.array(alist)[1:]
+            dEph=np.array(dElist)[1:]
             zaph=1/aph-1
             newE=np.array(Elist)[:-1]
 
@@ -268,12 +269,12 @@ for astart in alistiter:
             asum[:,:,0]+=np.array(binned_statistic_2d(newr,aph,aph,statistic='sum', bins=[rbins,abins])[0])
             zsum[:,:,0]+=np.array(binned_statistic_2d(newr,aph,zaph,statistic='sum', bins=[rbins,abins])[0])
             rsum[:,:,0]+=np.array(binned_statistic_2d(newr,aph,newr,statistic='sum', bins=[rbins,abins])[0])
-            Esum[:,:,0]+=np.array(binned_statistic_2d(newr[1:],aph[1:],newE,statistic='sum', bins=[rbins,abins])[0])
+            Esum[:,:,0]+=np.array(binned_statistic_2d(newr,aph,newE,statistic='sum', bins=[rbins,abins])[0])
             result[:,:,1]+=np.array(binned_statistic_2d(newr,aph,dEph*dEph,statistic='sum', bins=[rbins,abins])[0])
             asum[:,:,1]+=np.array(binned_statistic_2d(newr,aph,aph*aph,statistic='sum', bins=[rbins,abins])[0])
             zsum[:,:,1]+=np.array(binned_statistic_2d(newr,aph,zaph*zaph,statistic='sum', bins=[rbins,abins])[0])
             rsum[:,:,1]+=np.array(binned_statistic_2d(newr,aph,newr*newr,statistic='sum', bins=[rbins,abins])[0])
-            Esum[:,:,1]+=np.array(binned_statistic_2d(newr[1:],aph[1:],newE*newE,statistic='sum', bins=[rbins,abins])[0])
+            Esum[:,:,1]+=np.array(binned_statistic_2d(newr,aph,newE*newE,statistic='sum', bins=[rbins,abins])[0])
             
             # masterx.append(np.array(xlist)/mpc)
             # mastery.append(np.array(ylist)/mpc)
@@ -301,7 +302,7 @@ for astart in alistiter:
         # newcomm.Gather(np.array(Rlist), resRlist, root=0)
         # newcomm.Gather(np.array(afarr), resafarr, root=0)
         # newcomm.Gather(np.array(Narr), resNarr, root=0)
-        
+    Etot=comm.gather(Etot,root=0)    
     photcount=comm.gather(photcount,root=0)
     result=comm.gather(result,root=0)
     asum=comm.gather(asum,root=0)
@@ -330,6 +331,7 @@ for astart in alistiter:
         mzsum=np.zeros(np.shape(result[0]))
         mrsum=np.zeros(np.shape(result[0]))
         mEsum=np.zeros(np.shape(result[0]))
+        mEtot=0.
         for ss in range(len(photcount)):
             mphotcount+=photcount[ss]
             mresult+=result[ss]
@@ -337,7 +339,8 @@ for astart in alistiter:
             mzsum+=zsum[ss]
             mrsum+=rsum[ss]
             mEsum+=Esum[ss]
-        tit='z'+str(int(1/astart-1))+'_'+'MBH'+str(mbh)+'_N'+str(Ntot)+'_binned'
+            mEtot+=Etot[ss]
+        tit='z'+str(int(1/astart-1))+'_'+'MBH'+str(mbh)+'_N'+str(Ntot)+'_binned_Etot'
         print(tit)
         print(Ecut)
         fil=tit+'.pkl'
@@ -349,6 +352,7 @@ for astart in alistiter:
             pickle.dump(mzsum,f)
             pickle.dump(mrsum,f)
             pickle.dump(mEsum,f)
+            pickle.dump(mEtot,f)
             #with open(fil,"rb") as f:
             #Rlist=pickle.load(f)
             #afarr=pickle.load(f)

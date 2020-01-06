@@ -124,13 +124,13 @@ sqrtomegaM=np.sqrt(omegaM)
 # alogbins=np.arange(np.log(astart),np.log(afinal),astep)
 
 astep=0.1
-astart=1/1301.
+astart=1/1501.
 afinal=1/51.
 alogbins=np.arange(np.log(astart),np.log(afinal),astep)
 abins=np.exp(alogbins)
 
 nrbins=70
-logr=np.linspace(np.log(20),np.log(600),nrbins)
+logr=np.linspace(np.log(1),np.log(600),nrbins)
 rbins=np.insert(np.exp(logr),0,0)
 rbins=np.append(rbins,100000)
 
@@ -141,20 +141,20 @@ dt=dtfunc(abins[:-1],abins[1:])
 dR=4*pi/3*(rbins[1:]**3-rbins[:-1]**3)
 # amean=1.
 
-astartb=1/1301.
-aliststep=0.05
+astartb=1/1501.
+aliststep=0.1
 alistiter=np.exp(np.arange(np.log(astartb),np.log(1/(zfinal+50)),aliststep))
 
 
 znam=np.asarray(1/alistiter-1, dtype=int)
-mbh=100
-Nnam=100000
+mbh=10
+Nnam=4000000
 
-T_file='PBH_MBH_%s_T_novbc.dat' % (mbh)
-ldf=np.loadtxt(T_file)
-Tfarr=ldf[:-1,-1]
-zarr=ldf[:-1,0]
-Tf=interpolate.interp1d(np.log(1/(1+zarr)),Tfarr,kind='cubic')
+# T_file='PBH_MBH_%s_T_novbc.dat' % (mbh)
+# ldf=np.loadtxt(T_file)
+# Tfarr=ldf[:-1,-1]
+# zarr=ldf[:-1,0]
+# Tf=interpolate.interp1d(np.log(1/(1+zarr)),Tfarr,kind='cubic')
 
 
 nphotbin={}
@@ -170,10 +170,10 @@ Estat={}
 Emin=0.01
 nEbins=20.
 
-znam=znam[znam > 450] #redshifts below this caused problems with photons never scattering
+znam=znam#[znam > 450] #redshifts below this caused problems with photons never scattering
 
 for zz in znam:
-    fil='pickle/z%s_MBH%s_N%s_binned.pkl' % (zz,mbh,Nnam)
+    fil='pickle/mbh10_rmin1_ainjstep0.1/z%s_MBH%s_N%s_binned.pkl' % (zz,mbh,Nnam)
 
     with open('./'+fil,"rb") as f:
         tnphotbin=pickle.load(f)
@@ -184,10 +184,10 @@ for zz in znam:
         tEdist=pickle.load(f)
         #    tNscatter=pickle.load(f)
 
-    ttotnum=Nnam*nEbins
+    ttotnum=Nnam
     tastat=1/(1.+zz)
-    tEstat=Tf(np.log(tastat))*me
-
+    #    tEstat=Tf(np.log(tastat))*me
+    tEstat=.447*me
     nphotbin['z%s' % (zz)]=tnphotbin
     ardep['z%s' % (zz)]=tardep
     adist['z%s' % (zz)]=tadist
@@ -275,7 +275,7 @@ for nam in ardep:
     rgord=np.linspace(0,1,len(zplts))
     rgba=cmapV(rgord)
     indxarr=np.zeros(len(zplts),dtype='int')
-    err=np.sqrt(ardep[nam][:,:,1]/nphotbin[nam]-(ardep[nam][:,:,0]/nphotbin[nam])**2)/tmpdenom/(nphot*E)
+#    err=np.sqrt(ardep[nam][:,:,1]/nphotbin[nam]-(ardep[nam][:,:,0]/nphotbin[nam])**2)/tmpdenom/(nphot*E)
     # pdb.set_trace()
     fig,ax=plt.subplots(1,1)
 #    ax.plot([],[],lw=0,label=r'($z_{\rm mean}$, $E_{\rm mean}$)')
@@ -326,7 +326,7 @@ for nam in ardep:
     ax.set_title(r'$E_{\rm cut}=$%s $(m_e)$, $z_{\rm inj}=$%s, $N_{\rm tot}=$%s' % (int(Ecut/me*1000)/1000., int(1/a-1), nphot), fontsize=18)
     ax.set_xscale('log')
     fig.tight_layout()
-    plt.savefig('./figures/spatial_Espec/spec_'+nam+'.pdf')
+    plt.savefig('./figures/spatial_Espec_correct/spec_'+nam+'.pdf')
     # ax.set_yscale('log')
     # fig.tight_layout()
     # ax.legend(fontsize=14,loc='lower right',ncol=3,labelspacing=0.2).set_zorder(10000)
