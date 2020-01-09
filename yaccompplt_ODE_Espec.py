@@ -86,14 +86,15 @@ aeq=4.15e-5/(omegaM*h**2)
 
 
 folsav='/home/data/tj796/Research/radtrans/figures/temporal_Espec/'
-fol='/home/data/tj796/Research/radtrans/pickle/mbh100_rmin20_ainjstep0.05/'
+fol='/home/data/tj796/Research/radtrans/repo/radtrans/pickle/mbh10_rmin1_ainjstep0.1/'
+#fol='/home/data/tj796/Research/radtrans/pickle/mbh100_rmin20_ainjstep0.05/'
 
 nrbins=70
-logr=np.linspace(np.log(20),np.log(600),nrbins)
+logr=np.linspace(np.log(1),np.log(600),nrbins)
 rbins=np.insert(np.exp(logr),0,0)
 rbins=np.append(rbins,100000)
 
-astart=1/(1301.)
+astart=1/(1501.)
 afinal=1/51.
 zfinal=50.
 astep=0.1
@@ -110,21 +111,21 @@ dR=4*pi/3*(rbins[1:]**3-rbins[:-1]**3)#/rmean
 # amean=1.
 
 
-mbh=100
-T_file='PBH_MBH_%s_T_novbc.dat' % (mbh)
-ldf=np.loadtxt(T_file)
-Tfarr=ldf[:-1,-1]
-zarr=ldf[:-1,0]
-Tf=interpolate.interp1d(np.log(1/(1+zarr)),Tfarr,kind='cubic')
+mbh=10
+# T_file='PBH_MBH_%s_T_novbc.dat' % (mbh)
+# ldf=np.loadtxt(T_file)
+# Tfarr=ldf[:-1,-1]
+# zarr=ldf[:-1,0]
+# Tf=interpolate.interp1d(np.log(1/(1+zarr)),Tfarr,kind='cubic')
 
-astartb=1/1301.
-aliststep=0.05
+astartb=1/1501.
+aliststep=0.1
 alistiter=np.exp(np.arange(np.log(astartb),np.log(1/(zfinal+50)),aliststep))
 
 
-fil='comp/ardep_comp_v2.pkl'
+#fil='comp/ardep_comp_v2.pkl'
 
-Emin=0.01
+Emin=0.045
 nEbins=20.
 
 
@@ -132,10 +133,10 @@ nEbins=20.
 
 zbins=1/np.exp(alogbins)-1
 #Erat=1/0.1
-Ntot=100000
+Ntot=4000000
 
 for astart in alistiter:
-    tit='z'+str(int(1/astart-1))+'_'+'MBH'+str(mbh)+'_N'+str(Ntot)+'_binned.pkl'
+    tit='z'+str(int(1/astart-1))+'_'+'MBH'+str(mbh)+'_N'+str(Ntot)+'_binned_Etot.pkl'
     with open(fol+tit,"rb") as f:
         nphotbin=pickle.load(f)
         ardep=pickle.load(f)
@@ -143,17 +144,18 @@ for astart in alistiter:
         zdist=pickle.load(f)
         rdist=pickle.load(f)
         Edist=pickle.load(f)
+        Etot=pickle.load(f)
     nam='z'+str(int(1/astart-1))+'_'+'MBH'+str(mbh)+'_N'+str(Ntot)
-    Ecut=Tf(np.log(astart))
+    #    Ecut=Tf(np.log(astart))
+    Ecut=.447
     Ebins=np.linspace(Emin,Ecut,nEbins)
     dE=(Ecut-Emin)/nEbins
-    Etot=(Ebins*Ntot).sum()
     print(nam)
     # if nam != 'z1250_E5':
     #     continue
     
 
-    nphot=Ntot*nEbins
+    nphot=Ntot
     a=astart
     zwh=np.where(zbins <= 1/a-1)[0]
     zmean=(zdist[:,:,0].sum(axis=0))/nphotbin.sum(axis=0)
@@ -177,10 +179,10 @@ for astart in alistiter:
             Xstep[ev]=imptstep(XODEnewt,pXODEnewt,adisc[ev],Xstep[ev-1],dlna)
             
         if (ee == 0) or (ee == len(Ebins)-1):
-            NEWODE+=newG(adisc,Xstep,E)*E/2.
+            NEWODE+=newG(adisc,Xstep,E)/2.
         else:
-            NEWODE+=newG(adisc,Xstep,E)*E
-        NEWODE=dE*NEWODE/(Ecut*Ebins.sum()*me)
+            NEWODE+=newG(adisc,Xstep,E)
+    NEWODE=dE*NEWODE/(Ecut)
     print('Finished PDE solver.')
     print('%s PDEs took: %s seconds' % (len(Ebins),time.time()-ttot))
     if zwh[0]-1 > -1:
@@ -192,7 +194,7 @@ for astart in alistiter:
         tmpdenom=denom
         #for nam in ['z1266_E0.11']:
     G=ardep[:,:,0]/tmpdenom
-    Gt=spacialint(G,dR,dt)*dE/(Ecut*Etot*me)/(HubbleRate(a))#*8.831793880834816e-14#*7.8e-5
+    Gt=spacialint(G,dR,dt)/(Etot*HubbleRate(a))#*8.831793880834816e-14#*7.8e-5
     #Gt=spacialint(G,pi*(rbins[1:]**4-rbins[:-1]**4),dt)*Ecut/Etot
     #pdb.set_trace()
     if Ecut/me <0.2:
@@ -226,6 +228,7 @@ for astart in alistiter:
     #pdb.set_trace()
     #*NEWODE[test]/Gt[zwh[0]]
     ax.scatter(zmean[zwh],Gt[zwh],s=12,zorder=3)
+    print(Etot,HubbleRate(a))
     print(NEWODE[test]/Gt[zwh[0]])
     #pdb.set_trace()
     # cbar=plt.colorbar(sc)
