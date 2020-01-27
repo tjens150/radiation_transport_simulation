@@ -9,16 +9,25 @@ import pdb
 
 
 #CONSTANTS all in EV, meters, seconds
-me=.511*10**6
-zfinal=50.
-c=299792458.0
-mpc=3.086*10**22
-sigT=6.652459*10**(-29.)
-nh0=8.6*0.022
-H0=2.197*10**(-18)
-omegaM=0.308
+me=.511*10**6 #electron mass
+c=299792458.0 #speed of light
+mpc=3.086*10**22 #Mpc in m
+zfinal=50. #end of simulation
+sigT=6.652459*10**(-29.) #thomson cross section
+
+#Cosmological parameters
 h=0.67
-aeq=4.15e-5/(omegaM*h**2)
+YHe=0.24 #fraction of Helium from BBN
+H0=100.*h*1000./mpc # Hubble constant in seconds
+T0=2.73 #CMB temp today
+Nnueff=3.046 #dof of Neutrinos
+omegaM=0.1409/h**2 #matter density
+omegaR=T0**4*4.48162687719e-7*(1+0.227107318*Nnueff)/h**2 #relativistic density
+omegaK=0. #Curvature density
+omegaDE=1-omegaM-omegaR-omegaK #Dark Energy density
+aeq=4.15e-5/(omegaM*h**2) #matter radiation equaltiy
+omegab=0.02226/h**2 #baryon density
+nh0=(1-YHe)*11.3*omegab*h**2 #density of hydrogen today
 
 
 

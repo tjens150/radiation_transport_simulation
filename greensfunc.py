@@ -6,21 +6,23 @@ import pdb
 import matplotlib.pyplot as plt
 
 #CONSTANTS all in EV, meters, seconds
-me=.511*10**6
-zfinal=50.
-c=299792458.0
-mpc=3.086*10**22
-sigT=6.652459*10**(-29.)
-nh0=8.6*0.022
-H0=2.197*10**(-18)
+me=.511*10**6 #electron mass
+c=299792458.0 #speed of light
+mpc=3.086*10**22 #Mpc in m
+
+#Cosmological parameters
 h=0.67
-T0=2.73
-Nnueff=3.046
-omegaM=0.308
-omegaR=T0**4*4.48162687719e-7*(1+0.227107318*Nnueff)/h**2
-omegaK=0.
-omegaDE=1-omegaM-omegaR-omegaK
-aeq=4.15e-5/(omegaM*h**2)
+YHe=0.24 #fraction of Helium from BBN
+H0=100.*h*1000./mpc # Hubble constant in seconds
+T0=2.73 #CMB temp today
+Nnueff=3.046 #dof of Neutrinos
+omegaM=0.1409/h**2 #matter density
+omegaR=T0**4*4.48162687719e-7*(1+0.227107318*Nnueff)/h**2 #relativistic density
+omegaK=0. #Curvature density
+omegaDE=1-omegaM-omegaR-omegaK #Dark Energy density
+aeq=4.15e-5/(omegaM*h**2) #matter radiation equaltiy
+omegab=0.02226/h**2 #baryon density
+nh0=(1-YHe)*11.3*omegab*h**2 #density of hydrogen today
 
 def HubbleRate(a): #Compute Hubble
     return H0*np.sqrt(omegaM/a**3+omegaK/a**2+omegaDE+omegaR/a**4)
@@ -45,14 +47,16 @@ def find_nearest(array, value): #Returns index of the entry in array closest to 
 class spatial_greens: 
 
 
-    rbins=None
-    abins=None
-    G=None
-    Gnorm=None
-    nphotbin=None
-    adist=None
-    zdist=None
-    rdist=None
+    rbins=None #radial deposition bins
+    abins=None #temporal deposition bins
+    G=None #2d in r-dep and a-dep green's function for a given injection time
+    Gnorm=None #Spatially integrated G, 1d in a-dep, overall normalization
+
+    #read in data from radtrans.py
+    nphotbin=None #number of scatters in each bin
+    adist=None #sum of a and a^2 of scattering in each bin for statistics
+    zdist=None #sum of z and z^2 of scattering in each bin for statistics
+    rdist=None #sum of r and r^2 of scattering in each bin for statistics
 
     def __init__(self, rbins, abins): #bins used to generate histogram in radtrans.py
         self.rbins=rbins
@@ -60,17 +64,17 @@ class spatial_greens:
         
     #With a given initial ai of injection
     #Loads in the binned statistics pickle file generated from radtrans.py
-    #and returns the Green's function, and its temporal part.
+    #and stores the Green's function, and its temporal part.
     def gen_greens(self,ai,pikfil=None): 
         with open(pikfil,"rb") as f:
-            ardep=pickle.load(f)
+            ardep=pickle.load(f) #sum of dE in each bin
             self.nphotbin=pickle.load(f)
             self.adist=pickle.load(f)    
             self.zdist=pickle.load(f)
             self.rdist=pickle.load(f)
-            Etot=pickle.load(f)
-        dR=4*pi/3*(self.rbins[1:]**3-self.rbins[:-1]**3)
-        dt=dtfunc(self.abins[:-1],self.abins[1:])
+            Etot=pickle.load(f) #total energy injected into simulation
+        dR=4*pi/3*(self.rbins[1:]**3-self.rbins[:-1]**3) #volume of each bin
+        dt=dtfunc(self.abins[:-1],self.abins[1:]) #time of each bin
         denom=dR[:,np.newaxis]*dt[np.newaxis,:]
         self.G=ardep[:,:,0]/(denom*Etot*HubbleRate(ai))
         self.Gnorm=spacialint(self.G,dR,dt)
@@ -80,20 +84,23 @@ class spatial_greens:
     #plots the normalized spatial Green's functions at zplts,
     #then optionally saves the plot in savfol.
     def plot_spatial(self,ai, Eparam, Ntot, zplts, savfol=None):
+
+        #Colors for plot
         import colormaps as cmaps
         plt.register_cmap(name='viridis', cmap=cmaps.viridis)
         cmapV=plt.cm.get_cmap('viridis')
         rgord=np.linspace(0,1,len(zplts))
         rgba=cmapV(rgord)
+
         fig, ax=plt.subplots(1,1)
 
         G, Gnorm = self.G, self.Gnorm
-        zmean=(self.zdist[:,:,0].sum(axis=0))/self.nphotbin.sum(axis=0)
-        rmean=(self.rdist[:,:,0])/self.nphotbin
+        zmean=(self.zdist[:,:,0].sum(axis=0))/self.nphotbin.sum(axis=0) #mean z for each temporal bin
+        rmean=(self.rdist[:,:,0])/self.nphotbin #mean r of scatter population in each bin
         zbins=1/self.abins-1
         for cc in range(len(zplts)):
-            indx=find_nearest(zmean,zplts[cc])
-            cut=(self.nphotbin[:,indx]>100)
+            indx=find_nearest(zmean,zplts[cc]) #find the bin closest to desired z-plot
+            cut=(self.nphotbin[:,indx]>100) #arbitrary cut off for high-number statistics
             ax.plot(rmean[cut,indx],4*pi*rmean[cut,indx]**3*G[cut,indx]/Gnorm[indx],lw=2,color=rgba[cc], zorder=cc,label=r'(%s$\leq z\leq$ %s)' % (int(zbins[indx]),int(zbins[indx+1])))
 
         ll=ax.legend(fontsize=10,loc='upper left',ncol=1,labelspacing=0.2,handlelength=0.75)

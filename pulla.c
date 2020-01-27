@@ -1035,14 +1035,15 @@ static const char __pyx_k_astep[] = "astep";
 static const char __pyx_k_ppull[] = "ppull";
 static const char __pyx_k_pulla[] = "pulla";
 static const char __pyx_k_Eistep[] = "Eistep";
+static const char __pyx_k_afinal[] = "afinal";
 static const char __pyx_k_ptmpco[] = "ptmpco";
 static const char __pyx_k_pxstep[] = "pxstep";
-static const char __pyx_k_zfinal[] = "zfinal";
 static const char __pyx_k_pulla_cy[] = "_pulla_cy";
 static const char __pyx_k_pulla_pyx[] = "pulla.pyx";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static PyObject *__pyx_n_s_Eistep;
 static PyObject *__pyx_n_s_aeq;
+static PyObject *__pyx_n_s_afinal;
 static PyObject *__pyx_n_s_astep;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_dlna;
@@ -1059,8 +1060,7 @@ static PyObject *__pyx_n_s_pxstep;
 static PyObject *__pyx_n_s_seed;
 static PyObject *__pyx_n_s_sigT;
 static PyObject *__pyx_n_s_test;
-static PyObject *__pyx_n_s_zfinal;
-static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_astep, double __pyx_v_Eistep, double __pyx_v_zfinal, double __pyx_v_ptmpco, double __pyx_v_aeq, double __pyx_v_me, double __pyx_v_sigT, int __pyx_v_seed); /* proto */
+static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_astep, double __pyx_v_Eistep, double __pyx_v_afinal, double __pyx_v_ptmpco, double __pyx_v_aeq, double __pyx_v_me, double __pyx_v_sigT, int __pyx_v_seed); /* proto */
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_codeobj__2;
 /* Late includes */
@@ -1068,9 +1068,9 @@ static PyObject *__pyx_codeobj__2;
 /* "pulla.pyx":9
  *     double sqrt(double x)
  * 
- * def pulla(double astep, double Eistep, double zfinal, double ptmpco, double aeq, double me, double sigT,int seed):             # <<<<<<<<<<<<<<
+ * def pulla(double astep, double Eistep, double afinal, double ptmpco, double aeq, double me, double sigT,int seed):             # <<<<<<<<<<<<<<
  *     cdef double dlna, ppull, pxstep, ptmp
- *     if Eistep < 200:
+ *     if Eistep < 2000.: #about 0.005*me
  */
 
 /* Python wrapper */
@@ -1079,7 +1079,7 @@ static PyMethodDef __pyx_mdef_9_pulla_cy_1pulla = {"pulla", (PyCFunction)(void*)
 static PyObject *__pyx_pw_9_pulla_cy_1pulla(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   double __pyx_v_astep;
   double __pyx_v_Eistep;
-  double __pyx_v_zfinal;
+  double __pyx_v_afinal;
   double __pyx_v_ptmpco;
   double __pyx_v_aeq;
   double __pyx_v_me;
@@ -1089,7 +1089,7 @@ static PyObject *__pyx_pw_9_pulla_cy_1pulla(PyObject *__pyx_self, PyObject *__py
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("pulla (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_astep,&__pyx_n_s_Eistep,&__pyx_n_s_zfinal,&__pyx_n_s_ptmpco,&__pyx_n_s_aeq,&__pyx_n_s_me,&__pyx_n_s_sigT,&__pyx_n_s_seed,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_astep,&__pyx_n_s_Eistep,&__pyx_n_s_afinal,&__pyx_n_s_ptmpco,&__pyx_n_s_aeq,&__pyx_n_s_me,&__pyx_n_s_sigT,&__pyx_n_s_seed,0};
     PyObject* values[8] = {0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -1127,7 +1127,7 @@ static PyObject *__pyx_pw_9_pulla_cy_1pulla(PyObject *__pyx_self, PyObject *__py
         }
         CYTHON_FALLTHROUGH;
         case  2:
-        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_zfinal)) != 0)) kw_args--;
+        if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_afinal)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("pulla", 1, 8, 8, 2); __PYX_ERR(0, 9, __pyx_L3_error)
         }
@@ -1179,7 +1179,7 @@ static PyObject *__pyx_pw_9_pulla_cy_1pulla(PyObject *__pyx_self, PyObject *__py
     }
     __pyx_v_astep = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_astep == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L3_error)
     __pyx_v_Eistep = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_Eistep == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L3_error)
-    __pyx_v_zfinal = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_zfinal == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L3_error)
+    __pyx_v_afinal = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_afinal == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L3_error)
     __pyx_v_ptmpco = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_ptmpco == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L3_error)
     __pyx_v_aeq = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_aeq == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L3_error)
     __pyx_v_me = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_me == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 9, __pyx_L3_error)
@@ -1194,14 +1194,14 @@ static PyObject *__pyx_pw_9_pulla_cy_1pulla(PyObject *__pyx_self, PyObject *__py
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_9_pulla_cy_pulla(__pyx_self, __pyx_v_astep, __pyx_v_Eistep, __pyx_v_zfinal, __pyx_v_ptmpco, __pyx_v_aeq, __pyx_v_me, __pyx_v_sigT, __pyx_v_seed);
+  __pyx_r = __pyx_pf_9_pulla_cy_pulla(__pyx_self, __pyx_v_astep, __pyx_v_Eistep, __pyx_v_afinal, __pyx_v_ptmpco, __pyx_v_aeq, __pyx_v_me, __pyx_v_sigT, __pyx_v_seed);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_astep, double __pyx_v_Eistep, double __pyx_v_zfinal, double __pyx_v_ptmpco, double __pyx_v_aeq, double __pyx_v_me, double __pyx_v_sigT, int __pyx_v_seed) {
+static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, double __pyx_v_astep, double __pyx_v_Eistep, double __pyx_v_afinal, double __pyx_v_ptmpco, double __pyx_v_aeq, double __pyx_v_me, double __pyx_v_sigT, int __pyx_v_seed) {
   double __pyx_v_dlna;
   double __pyx_v_ppull;
   double __pyx_v_pxstep;
@@ -1221,21 +1221,21 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
   __Pyx_RefNannySetupContext("pulla", 0);
 
   /* "pulla.pyx":11
- * def pulla(double astep, double Eistep, double zfinal, double ptmpco, double aeq, double me, double sigT,int seed):
+ * def pulla(double astep, double Eistep, double afinal, double ptmpco, double aeq, double me, double sigT,int seed):
  *     cdef double dlna, ppull, pxstep, ptmp
- *     if Eistep < 200:             # <<<<<<<<<<<<<<
- *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT
+ *     if Eistep < 2000.: #about 0.005*me             # <<<<<<<<<<<<<<
+ *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT #thomson limit
  *     else:
  */
-  __pyx_t_1 = ((__pyx_v_Eistep < 200.0) != 0);
+  __pyx_t_1 = ((__pyx_v_Eistep < 2000.) != 0);
   if (__pyx_t_1) {
 
     /* "pulla.pyx":12
  *     cdef double dlna, ppull, pxstep, ptmp
- *     if Eistep < 200:
- *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT             # <<<<<<<<<<<<<<
+ *     if Eistep < 2000.: #about 0.005*me
+ *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT #thomson limit             # <<<<<<<<<<<<<<
  *     else:
- *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*(3/8.)*sigT*me/(Eistep*Eistep)*(2.*(Eistep**3 + 9.*Eistep*Eistep*me+8.*Eistep*me*me+2.*me**3)/((2.*Eistep+me)*(2.*Eistep+me))+(Eistep-2.*me-2.*me*me/Eistep)*log(1.+2.*Eistep/me))
+ *        #ptmpco is c*nh0/sqrt(H0*omegaM)
  */
     if (unlikely(__pyx_v_astep == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
@@ -1249,18 +1249,18 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
     __pyx_v_ptmp = ((__pyx_v_ptmpco / __pyx_t_2) * __pyx_v_sigT);
 
     /* "pulla.pyx":11
- * def pulla(double astep, double Eistep, double zfinal, double ptmpco, double aeq, double me, double sigT,int seed):
+ * def pulla(double astep, double Eistep, double afinal, double ptmpco, double aeq, double me, double sigT,int seed):
  *     cdef double dlna, ppull, pxstep, ptmp
- *     if Eistep < 200:             # <<<<<<<<<<<<<<
- *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT
+ *     if Eistep < 2000.: #about 0.005*me             # <<<<<<<<<<<<<<
+ *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT #thomson limit
  *     else:
  */
     goto __pyx_L3;
   }
 
-  /* "pulla.pyx":14
- *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT
- *     else:
+  /* "pulla.pyx":16
+ *        #ptmpco is c*nh0/sqrt(H0*omegaM)
+ *        #probability to scatter in dlna, long expression comes from sigma
  *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*(3/8.)*sigT*me/(Eistep*Eistep)*(2.*(Eistep**3 + 9.*Eistep*Eistep*me+8.*Eistep*me*me+2.*me**3)/((2.*Eistep+me)*(2.*Eistep+me))+(Eistep-2.*me-2.*me*me/Eistep)*log(1.+2.*Eistep/me))             # <<<<<<<<<<<<<<
  *     dlna=min(0.001/ptmp,0.001)
  *     srand(seed)
@@ -1268,41 +1268,41 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
   /*else*/ {
     if (unlikely(__pyx_v_astep == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 14, __pyx_L1_error)
+      __PYX_ERR(0, 16, __pyx_L1_error)
     }
     __pyx_t_2 = sqrt((((__pyx_v_astep * __pyx_v_astep) * __pyx_v_astep) * (1.0 + (__pyx_v_aeq / __pyx_v_astep))));
     if (unlikely(__pyx_t_2 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 14, __pyx_L1_error)
+      __PYX_ERR(0, 16, __pyx_L1_error)
     }
     __pyx_t_3 = ((((__pyx_v_ptmpco / __pyx_t_2) * (3.0 / 8.)) * __pyx_v_sigT) * __pyx_v_me);
     __pyx_t_2 = (__pyx_v_Eistep * __pyx_v_Eistep);
     if (unlikely(__pyx_t_2 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 14, __pyx_L1_error)
+      __PYX_ERR(0, 16, __pyx_L1_error)
     }
     __pyx_t_4 = (2. * (((pow(__pyx_v_Eistep, 3.0) + (((9. * __pyx_v_Eistep) * __pyx_v_Eistep) * __pyx_v_me)) + (((8. * __pyx_v_Eistep) * __pyx_v_me) * __pyx_v_me)) + (2. * pow(__pyx_v_me, 3.0))));
     __pyx_t_5 = (((2. * __pyx_v_Eistep) + __pyx_v_me) * ((2. * __pyx_v_Eistep) + __pyx_v_me));
     if (unlikely(__pyx_t_5 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 14, __pyx_L1_error)
+      __PYX_ERR(0, 16, __pyx_L1_error)
     }
     __pyx_t_6 = ((2. * __pyx_v_me) * __pyx_v_me);
     if (unlikely(__pyx_v_Eistep == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 14, __pyx_L1_error)
+      __PYX_ERR(0, 16, __pyx_L1_error)
     }
     __pyx_t_7 = (2. * __pyx_v_Eistep);
     if (unlikely(__pyx_v_me == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 14, __pyx_L1_error)
+      __PYX_ERR(0, 16, __pyx_L1_error)
     }
     __pyx_v_ptmp = ((__pyx_t_3 / __pyx_t_2) * ((__pyx_t_4 / __pyx_t_5) + (((__pyx_v_Eistep - (2. * __pyx_v_me)) - (__pyx_t_6 / __pyx_v_Eistep)) * log((1. + (__pyx_t_7 / __pyx_v_me))))));
   }
   __pyx_L3:;
 
-  /* "pulla.pyx":15
- *     else:
+  /* "pulla.pyx":17
+ *        #probability to scatter in dlna, long expression comes from sigma
  *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*(3/8.)*sigT*me/(Eistep*Eistep)*(2.*(Eistep**3 + 9.*Eistep*Eistep*me+8.*Eistep*me*me+2.*me**3)/((2.*Eistep+me)*(2.*Eistep+me))+(Eistep-2.*me-2.*me*me/Eistep)*log(1.+2.*Eistep/me))
  *     dlna=min(0.001/ptmp,0.001)             # <<<<<<<<<<<<<<
  *     srand(seed)
@@ -1311,7 +1311,7 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
   __pyx_t_7 = 0.001;
   if (unlikely(__pyx_v_ptmp == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 15, __pyx_L1_error)
+    __PYX_ERR(0, 17, __pyx_L1_error)
   }
   __pyx_t_6 = (0.001 / __pyx_v_ptmp);
   if (((__pyx_t_7 < __pyx_t_6) != 0)) {
@@ -1321,7 +1321,7 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
   }
   __pyx_v_dlna = __pyx_t_5;
 
-  /* "pulla.pyx":16
+  /* "pulla.pyx":18
  *        ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*(3/8.)*sigT*me/(Eistep*Eistep)*(2.*(Eistep**3 + 9.*Eistep*Eistep*me+8.*Eistep*me*me+2.*me**3)/((2.*Eistep+me)*(2.*Eistep+me))+(Eistep-2.*me-2.*me*me/Eistep)*log(1.+2.*Eistep/me))
  *     dlna=min(0.001/ptmp,0.001)
  *     srand(seed)             # <<<<<<<<<<<<<<
@@ -1330,7 +1330,7 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
  */
   srand(__pyx_v_seed);
 
-  /* "pulla.pyx":17
+  /* "pulla.pyx":19
  *     dlna=min(0.001/ptmp,0.001)
  *     srand(seed)
  *     ppull = float(rand())/(float(RAND_MAX))             # <<<<<<<<<<<<<<
@@ -1339,11 +1339,11 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
  */
   if (unlikely(((double)RAND_MAX) == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 17, __pyx_L1_error)
+    __PYX_ERR(0, 19, __pyx_L1_error)
   }
   __pyx_v_ppull = (((double)rand()) / ((double)RAND_MAX));
 
-  /* "pulla.pyx":18
+  /* "pulla.pyx":20
  *     srand(seed)
  *     ppull = float(rand())/(float(RAND_MAX))
  *     pxstep=ptmp*dlna             # <<<<<<<<<<<<<<
@@ -1352,125 +1352,120 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
  */
   __pyx_v_pxstep = (__pyx_v_ptmp * __pyx_v_dlna);
 
-  /* "pulla.pyx":19
+  /* "pulla.pyx":21
  *     ppull = float(rand())/(float(RAND_MAX))
  *     pxstep=ptmp*dlna
  *     while pxstep< ppull:             # <<<<<<<<<<<<<<
  *         ppull=float(rand())/(float(RAND_MAX))
- *         Eistep=Eistep*astep/(astep*(1+dlna))
+ *         Eistep=Eistep/(1+dlna)
  */
   while (1) {
     __pyx_t_1 = ((__pyx_v_pxstep < __pyx_v_ppull) != 0);
     if (!__pyx_t_1) break;
 
-    /* "pulla.pyx":20
+    /* "pulla.pyx":22
  *     pxstep=ptmp*dlna
  *     while pxstep< ppull:
  *         ppull=float(rand())/(float(RAND_MAX))             # <<<<<<<<<<<<<<
- *         Eistep=Eistep*astep/(astep*(1+dlna))
+ *         Eistep=Eistep/(1+dlna)
  *         astep=astep*(1+dlna)
  */
     if (unlikely(((double)RAND_MAX) == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 20, __pyx_L1_error)
+      __PYX_ERR(0, 22, __pyx_L1_error)
     }
     __pyx_v_ppull = (((double)rand()) / ((double)RAND_MAX));
 
-    /* "pulla.pyx":21
+    /* "pulla.pyx":23
  *     while pxstep< ppull:
  *         ppull=float(rand())/(float(RAND_MAX))
- *         Eistep=Eistep*astep/(astep*(1+dlna))             # <<<<<<<<<<<<<<
+ *         Eistep=Eistep/(1+dlna)             # <<<<<<<<<<<<<<
  *         astep=astep*(1+dlna)
- *         if 1/astep-1 < zfinal:
+ *         if astep > afinal:
  */
-    __pyx_t_5 = (__pyx_v_Eistep * __pyx_v_astep);
-    __pyx_t_7 = (__pyx_v_astep * (1.0 + __pyx_v_dlna));
-    if (unlikely(__pyx_t_7 == 0)) {
+    __pyx_t_5 = (1.0 + __pyx_v_dlna);
+    if (unlikely(__pyx_t_5 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 21, __pyx_L1_error)
+      __PYX_ERR(0, 23, __pyx_L1_error)
     }
-    __pyx_v_Eistep = (__pyx_t_5 / __pyx_t_7);
+    __pyx_v_Eistep = (__pyx_v_Eistep / __pyx_t_5);
 
-    /* "pulla.pyx":22
+    /* "pulla.pyx":24
  *         ppull=float(rand())/(float(RAND_MAX))
- *         Eistep=Eistep*astep/(astep*(1+dlna))
+ *         Eistep=Eistep/(1+dlna)
  *         astep=astep*(1+dlna)             # <<<<<<<<<<<<<<
- *         if 1/astep-1 < zfinal:
+ *         if astep > afinal:
  *             break
  */
     __pyx_v_astep = (__pyx_v_astep * (1.0 + __pyx_v_dlna));
 
-    /* "pulla.pyx":23
- *         Eistep=Eistep*astep/(astep*(1+dlna))
+    /* "pulla.pyx":25
+ *         Eistep=Eistep/(1+dlna)
  *         astep=astep*(1+dlna)
- *         if 1/astep-1 < zfinal:             # <<<<<<<<<<<<<<
+ *         if astep > afinal:             # <<<<<<<<<<<<<<
  *             break
- *         if Eistep < 200:
+ *         if Eistep < 2000.:
  */
-    if (unlikely(__pyx_v_astep == 0)) {
-      PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 23, __pyx_L1_error)
-    }
-    __pyx_t_1 = ((((1.0 / __pyx_v_astep) - 1.0) < __pyx_v_zfinal) != 0);
+    __pyx_t_1 = ((__pyx_v_astep > __pyx_v_afinal) != 0);
     if (__pyx_t_1) {
 
-      /* "pulla.pyx":24
+      /* "pulla.pyx":26
  *         astep=astep*(1+dlna)
- *         if 1/astep-1 < zfinal:
+ *         if astep > afinal:
  *             break             # <<<<<<<<<<<<<<
- *         if Eistep < 200:
+ *         if Eistep < 2000.:
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT
  */
       goto __pyx_L5_break;
 
-      /* "pulla.pyx":23
- *         Eistep=Eistep*astep/(astep*(1+dlna))
+      /* "pulla.pyx":25
+ *         Eistep=Eistep/(1+dlna)
  *         astep=astep*(1+dlna)
- *         if 1/astep-1 < zfinal:             # <<<<<<<<<<<<<<
+ *         if astep > afinal:             # <<<<<<<<<<<<<<
  *             break
- *         if Eistep < 200:
+ *         if Eistep < 2000.:
  */
     }
 
-    /* "pulla.pyx":25
- *         if 1/astep-1 < zfinal:
+    /* "pulla.pyx":27
+ *         if astep > afinal:
  *             break
- *         if Eistep < 200:             # <<<<<<<<<<<<<<
+ *         if Eistep < 2000.:             # <<<<<<<<<<<<<<
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT
  *         else:
  */
-    __pyx_t_1 = ((__pyx_v_Eistep < 200.0) != 0);
+    __pyx_t_1 = ((__pyx_v_Eistep < 2000.) != 0);
     if (__pyx_t_1) {
 
-      /* "pulla.pyx":26
+      /* "pulla.pyx":28
  *             break
- *         if Eistep < 200:
+ *         if Eistep < 2000.:
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT             # <<<<<<<<<<<<<<
  *         else:
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*(3/8.)*sigT*me/(Eistep*Eistep)*(2.*(Eistep**3 + 9.*Eistep*Eistep*me+8.*Eistep*me*me+2.*me**3)/((2.*Eistep+me)*(2.*Eistep+me))+(Eistep-2.*me-2.*me*me/Eistep)*log(1.+2.*Eistep/me))
  */
       if (unlikely(__pyx_v_astep == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 26, __pyx_L1_error)
+        __PYX_ERR(0, 28, __pyx_L1_error)
       }
-      __pyx_t_7 = sqrt((((__pyx_v_astep * __pyx_v_astep) * __pyx_v_astep) * (1.0 + (__pyx_v_aeq / __pyx_v_astep))));
-      if (unlikely(__pyx_t_7 == 0)) {
+      __pyx_t_5 = sqrt((((__pyx_v_astep * __pyx_v_astep) * __pyx_v_astep) * (1.0 + (__pyx_v_aeq / __pyx_v_astep))));
+      if (unlikely(__pyx_t_5 == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 26, __pyx_L1_error)
+        __PYX_ERR(0, 28, __pyx_L1_error)
       }
-      __pyx_v_ptmp = ((__pyx_v_ptmpco / __pyx_t_7) * __pyx_v_sigT);
+      __pyx_v_ptmp = ((__pyx_v_ptmpco / __pyx_t_5) * __pyx_v_sigT);
 
-      /* "pulla.pyx":25
- *         if 1/astep-1 < zfinal:
+      /* "pulla.pyx":27
+ *         if astep > afinal:
  *             break
- *         if Eistep < 200:             # <<<<<<<<<<<<<<
+ *         if Eistep < 2000.:             # <<<<<<<<<<<<<<
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT
  *         else:
  */
       goto __pyx_L7;
     }
 
-    /* "pulla.pyx":28
+    /* "pulla.pyx":30
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*sigT
  *         else:
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*(3/8.)*sigT*me/(Eistep*Eistep)*(2.*(Eistep**3 + 9.*Eistep*Eistep*me+8.*Eistep*me*me+2.*me**3)/((2.*Eistep+me)*(2.*Eistep+me))+(Eistep-2.*me-2.*me*me/Eistep)*log(1.+2.*Eistep/me))             # <<<<<<<<<<<<<<
@@ -1480,40 +1475,40 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
     /*else*/ {
       if (unlikely(__pyx_v_astep == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 28, __pyx_L1_error)
+        __PYX_ERR(0, 30, __pyx_L1_error)
       }
-      __pyx_t_7 = sqrt((((__pyx_v_astep * __pyx_v_astep) * __pyx_v_astep) * (1.0 + (__pyx_v_aeq / __pyx_v_astep))));
-      if (unlikely(__pyx_t_7 == 0)) {
+      __pyx_t_5 = sqrt((((__pyx_v_astep * __pyx_v_astep) * __pyx_v_astep) * (1.0 + (__pyx_v_aeq / __pyx_v_astep))));
+      if (unlikely(__pyx_t_5 == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 28, __pyx_L1_error)
+        __PYX_ERR(0, 30, __pyx_L1_error)
       }
-      __pyx_t_5 = ((((__pyx_v_ptmpco / __pyx_t_7) * (3.0 / 8.)) * __pyx_v_sigT) * __pyx_v_me);
-      __pyx_t_7 = (__pyx_v_Eistep * __pyx_v_Eistep);
-      if (unlikely(__pyx_t_7 == 0)) {
+      __pyx_t_7 = ((((__pyx_v_ptmpco / __pyx_t_5) * (3.0 / 8.)) * __pyx_v_sigT) * __pyx_v_me);
+      __pyx_t_5 = (__pyx_v_Eistep * __pyx_v_Eistep);
+      if (unlikely(__pyx_t_5 == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 28, __pyx_L1_error)
+        __PYX_ERR(0, 30, __pyx_L1_error)
       }
       __pyx_t_6 = (2. * (((pow(__pyx_v_Eistep, 3.0) + (((9. * __pyx_v_Eistep) * __pyx_v_Eistep) * __pyx_v_me)) + (((8. * __pyx_v_Eistep) * __pyx_v_me) * __pyx_v_me)) + (2. * pow(__pyx_v_me, 3.0))));
       __pyx_t_4 = (((2. * __pyx_v_Eistep) + __pyx_v_me) * ((2. * __pyx_v_Eistep) + __pyx_v_me));
       if (unlikely(__pyx_t_4 == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 28, __pyx_L1_error)
+        __PYX_ERR(0, 30, __pyx_L1_error)
       }
       __pyx_t_2 = ((2. * __pyx_v_me) * __pyx_v_me);
       if (unlikely(__pyx_v_Eistep == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 28, __pyx_L1_error)
+        __PYX_ERR(0, 30, __pyx_L1_error)
       }
       __pyx_t_3 = (2. * __pyx_v_Eistep);
       if (unlikely(__pyx_v_me == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 28, __pyx_L1_error)
+        __PYX_ERR(0, 30, __pyx_L1_error)
       }
-      __pyx_v_ptmp = ((__pyx_t_5 / __pyx_t_7) * ((__pyx_t_6 / __pyx_t_4) + (((__pyx_v_Eistep - (2. * __pyx_v_me)) - (__pyx_t_2 / __pyx_v_Eistep)) * log((1. + (__pyx_t_3 / __pyx_v_me))))));
+      __pyx_v_ptmp = ((__pyx_t_7 / __pyx_t_5) * ((__pyx_t_6 / __pyx_t_4) + (((__pyx_v_Eistep - (2. * __pyx_v_me)) - (__pyx_t_2 / __pyx_v_Eistep)) * log((1. + (__pyx_t_3 / __pyx_v_me))))));
     }
     __pyx_L7:;
 
-    /* "pulla.pyx":29
+    /* "pulla.pyx":31
  *         else:
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*(3/8.)*sigT*me/(Eistep*Eistep)*(2.*(Eistep**3 + 9.*Eistep*Eistep*me+8.*Eistep*me*me+2.*me**3)/((2.*Eistep+me)*(2.*Eistep+me))+(Eistep-2.*me-2.*me*me/Eistep)*log(1.+2.*Eistep/me))
  *         dlna=min(0.001/ptmp,0.001)             # <<<<<<<<<<<<<<
@@ -1523,7 +1518,7 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
     __pyx_t_3 = 0.001;
     if (unlikely(__pyx_v_ptmp == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 29, __pyx_L1_error)
+      __PYX_ERR(0, 31, __pyx_L1_error)
     }
     __pyx_t_2 = (0.001 / __pyx_v_ptmp);
     if (((__pyx_t_3 < __pyx_t_2) != 0)) {
@@ -1533,7 +1528,7 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
     }
     __pyx_v_dlna = __pyx_t_4;
 
-    /* "pulla.pyx":30
+    /* "pulla.pyx":32
  *            ptmp=ptmpco/sqrt(astep*astep*astep*(1+aeq/astep))*(3/8.)*sigT*me/(Eistep*Eistep)*(2.*(Eistep**3 + 9.*Eistep*Eistep*me+8.*Eistep*me*me+2.*me**3)/((2.*Eistep+me)*(2.*Eistep+me))+(Eistep-2.*me-2.*me*me/Eistep)*log(1.+2.*Eistep/me))
  *         dlna=min(0.001/ptmp,0.001)
  *         pxstep=ptmp*dlna             # <<<<<<<<<<<<<<
@@ -1543,17 +1538,17 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
   }
   __pyx_L5_break:;
 
-  /* "pulla.pyx":31
+  /* "pulla.pyx":33
  *         dlna=min(0.001/ptmp,0.001)
  *         pxstep=ptmp*dlna
  *     return astep, Eistep             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_8 = PyFloat_FromDouble(__pyx_v_astep); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_8 = PyFloat_FromDouble(__pyx_v_astep); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_9 = PyFloat_FromDouble(__pyx_v_Eistep); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_9 = PyFloat_FromDouble(__pyx_v_Eistep); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_10 = PyTuple_New(2); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __Pyx_GIVEREF(__pyx_t_8);
   PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8);
@@ -1568,9 +1563,9 @@ static PyObject *__pyx_pf_9_pulla_cy_pulla(CYTHON_UNUSED PyObject *__pyx_self, d
   /* "pulla.pyx":9
  *     double sqrt(double x)
  * 
- * def pulla(double astep, double Eistep, double zfinal, double ptmpco, double aeq, double me, double sigT,int seed):             # <<<<<<<<<<<<<<
+ * def pulla(double astep, double Eistep, double afinal, double ptmpco, double aeq, double me, double sigT,int seed):             # <<<<<<<<<<<<<<
  *     cdef double dlna, ppull, pxstep, ptmp
- *     if Eistep < 200:
+ *     if Eistep < 2000.: #about 0.005*me
  */
 
   /* function exit code */
@@ -1634,6 +1629,7 @@ static struct PyModuleDef __pyx_moduledef = {
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_Eistep, __pyx_k_Eistep, sizeof(__pyx_k_Eistep), 0, 0, 1, 1},
   {&__pyx_n_s_aeq, __pyx_k_aeq, sizeof(__pyx_k_aeq), 0, 0, 1, 1},
+  {&__pyx_n_s_afinal, __pyx_k_afinal, sizeof(__pyx_k_afinal), 0, 0, 1, 1},
   {&__pyx_n_s_astep, __pyx_k_astep, sizeof(__pyx_k_astep), 0, 0, 1, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_dlna, __pyx_k_dlna, sizeof(__pyx_k_dlna), 0, 0, 1, 1},
@@ -1650,7 +1646,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_seed, __pyx_k_seed, sizeof(__pyx_k_seed), 0, 0, 1, 1},
   {&__pyx_n_s_sigT, __pyx_k_sigT, sizeof(__pyx_k_sigT), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
-  {&__pyx_n_s_zfinal, __pyx_k_zfinal, sizeof(__pyx_k_zfinal), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
@@ -1664,11 +1659,11 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   /* "pulla.pyx":9
  *     double sqrt(double x)
  * 
- * def pulla(double astep, double Eistep, double zfinal, double ptmpco, double aeq, double me, double sigT,int seed):             # <<<<<<<<<<<<<<
+ * def pulla(double astep, double Eistep, double afinal, double ptmpco, double aeq, double me, double sigT,int seed):             # <<<<<<<<<<<<<<
  *     cdef double dlna, ppull, pxstep, ptmp
- *     if Eistep < 200:
+ *     if Eistep < 2000.: #about 0.005*me
  */
-  __pyx_tuple_ = PyTuple_Pack(12, __pyx_n_s_astep, __pyx_n_s_Eistep, __pyx_n_s_zfinal, __pyx_n_s_ptmpco, __pyx_n_s_aeq, __pyx_n_s_me, __pyx_n_s_sigT, __pyx_n_s_seed, __pyx_n_s_dlna, __pyx_n_s_ppull, __pyx_n_s_pxstep, __pyx_n_s_ptmp); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(12, __pyx_n_s_astep, __pyx_n_s_Eistep, __pyx_n_s_afinal, __pyx_n_s_ptmpco, __pyx_n_s_aeq, __pyx_n_s_me, __pyx_n_s_sigT, __pyx_n_s_seed, __pyx_n_s_dlna, __pyx_n_s_ppull, __pyx_n_s_pxstep, __pyx_n_s_ptmp); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
   __pyx_codeobj__2 = (PyObject*)__Pyx_PyCode_New(8, 0, 12, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple_, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_pulla_pyx, __pyx_n_s_pulla, 9, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__2)) __PYX_ERR(0, 9, __pyx_L1_error)
@@ -1950,9 +1945,9 @@ if (!__Pyx_RefNanny) {
   /* "pulla.pyx":9
  *     double sqrt(double x)
  * 
- * def pulla(double astep, double Eistep, double zfinal, double ptmpco, double aeq, double me, double sigT,int seed):             # <<<<<<<<<<<<<<
+ * def pulla(double astep, double Eistep, double afinal, double ptmpco, double aeq, double me, double sigT,int seed):             # <<<<<<<<<<<<<<
  *     cdef double dlna, ppull, pxstep, ptmp
- *     if Eistep < 200:
+ *     if Eistep < 2000.: #about 0.005*me
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_9_pulla_cy_1pulla, NULL, __pyx_n_s_pulla_cy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
