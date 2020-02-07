@@ -60,7 +60,7 @@ def rej(a,b,f,g,*args):
 #the rotation matrix R that rotates (sin(th) cos(ph), sin(th) sin(ph), cos(th)) into (0, 0, 1)
 def rotmat(thet,phi): 
     return [[np.cos(phi)*np.cos(thet),np.sin(phi)*np.cos(thet),-np.sin(thet)],
-            [-np.sin(thet),np.cos(phi),0],
+            [-np.sin(phi),np.cos(phi),0],
             [np.sin(thet)*np.cos(phi),np.sin(phi)*np.sin(thet),np.cos(thet)]]
 
 def rej(a,b,f,g,*args): 
@@ -126,7 +126,7 @@ def diracEspec(samp,Eret):
 
 # Computes histograms for delta E, a, z, and number of scatterings for Nphot photons injected at ai,
 # using any energy spcetrum function's CDF. Also returns total energy injected from Nphot photons
-def bin_photons(ai, Espec, amax, Nphot, rbins, abins, Eparams, rank=None, npstate=None):
+def bin_photons(ai, Espec, amax, Nphot, rbins, abins, Eparams, rank=None):
     #Initialize arrays for binning, both the sum of quantity and sum of the square for variance
     result=np.zeros([len(rbins)-1,len(abins)-1,2]) #delta E
     photcount=np.zeros([len(rbins)-1,len(abins)-1]) #number of scatterings in each bin
@@ -154,12 +154,15 @@ def bin_photons(ai, Espec, amax, Nphot, rbins, abins, Eparams, rank=None, npstat
 
 if __name__ == '__main__':
 
-    Ntot=4000000
+    Ntot=1000000
     ai=1/1501. #before this, energy injection is negligible 
     amax=1/51. #beyond this reionization becomes relevant
-    Emax=.447 #cut off for free-free (flat) energy spectrum of a PBH after recomb. (units of me)
+
+    #cut off for free-free (flat) energy spectrum of a PBH after recomb. (units of me)
+    Emax=.447 #collisional ionization case
+    Emax_PI=20.1 #photoionized case
     Emin=0.045 #Lower energy bound from which to sample, below this (2*pi*fine structure), photon wavelength is larger than bohr radius. (units of me)
-    Edirac=5. #if using dirac injection (units of me)
+    Edirac=5.0 #if using dirac injection (units of me)
 
     #2d bin initialization
     astep=0.1
@@ -174,13 +177,14 @@ if __name__ == '__main__':
 
     rank = comm.Get_rank() #get unique identifier for each CPU
     size = comm.Get_size() #number of CPUs
-    npstate=np.random.RandomState() #reinitialize a random state for each CPU
+    np.random.seed() #reinitialize a random state for each CPU
     #divide for each CPU
     N=int(Ntot / size)
     if not rank:
         N+=(Ntot-N*size)
 
-    result,photcount,asum,zsum,rsum,Etot = bin_photons(ai, diracEspec, amax, N, rbins, abins, Edirac, rank=rank, npstate=npstate)
+    result,photcount,asum,zsum,rsum,Etot = bin_photons(ai, diracEspec, amax, N, rbins, abins, Edirac, rank=rank)
+    # result,photcount,asum,zsum,rsum,Etot = bin_photons(ai, flatEspec, amax, N, rbins, abins, [Emax_PI,Emin], rank=rank, npstate=npstate)
     
     #Gather the arrays from all the CPUs
     result=comm.gather(result,root=0)
@@ -189,7 +193,6 @@ if __name__ == '__main__':
     zsum=comm.gather(zsum,root=0)
     rsum=comm.gather(rsum,root=0)
     Etot=comm.gather(Etot,root=0)
-    print(result)
     if not rank:
         #sum them together
         mresult=np.zeros_like(result[0])
@@ -207,7 +210,7 @@ if __name__ == '__main__':
             mEtot+=Etot[ss]
 
         #save the binned statistics
-        tit='z'+str(int(1/ai-1))+'_'+'E_dirac'+str(Edirac)+'_N'+str(Ntot)+'_binned_v2'
+        tit='z'+str(int(1/ai-1))+'_'+'E_dirac'+str(Edirac)+'_N'+str(Ntot)+'_binned_v2_fix'
         print(tit)
         fil=tit+'.pkl'
         with open('./pickle/'+fil, "wb") as f:
