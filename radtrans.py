@@ -147,15 +147,15 @@ def bin_photons(ai, Espec, amax, Nphot, rbins, abins, Eparams, rank=None):
         zsum += binstats(newr,aph,1/aph-1,[rbins,abins])
         rsum += binstats(newr,aph,newr,[rbins,abins])
         
-        if (rank == 0) & (not i % 1000):
+        if ((rank == 0) & (not i % 1000)) or (rank is None):
             print(i,'of ',N)
 
     return result, photcount, asum, zsum, rsum, Etot
 
 if __name__ == '__main__':
 
-    Ntot=1000000
-    ai=1/1501. #before this, energy injection is negligible 
+    Ntot=5000000
+    ai_bin=1/1501. #before this, energy injection is negligible 
     amax=1/51. #beyond this reionization becomes relevant
 
     #cut off for free-free (flat) energy spectrum of a PBH after recomb. (units of me)
@@ -166,13 +166,15 @@ if __name__ == '__main__':
 
     #2d bin initialization
     astep=0.1
-    abins=np.exp(np.arange(np.log(ai),np.log(amax),astep))
+    abins=np.exp(np.arange(np.log(ai_bin),np.log(amax),astep))
 
     nrbins=70
     logr=np.linspace(np.log(1),np.log(600),nrbins)
     rbins=np.insert(np.exp(logr),0,0)
     rbins=np.append(rbins,100000)
 
+    fol='./pickle/PI_ainjstep_1e-1/'
+    
     comm = MPI.COMM_WORLD #fork CPUs
 
     rank = comm.Get_rank() #get unique identifier for each CPU
@@ -182,41 +184,44 @@ if __name__ == '__main__':
     N=int(Ntot / size)
     if not rank:
         N+=(Ntot-N*size)
+    afinal=1/101.
+    aliststep=0.1
+    ailist=np.exp(np.arange(np.log(ai_bin),np.log(afinal),aliststep))
+    for ai in ailist:
+        # result,photcount,asum,zsum,rsum,Etot = bin_photons(ai, diracEspec, amax, N, rbins, abins, Edirac, rank=rank)
+        result,photcount,asum,zsum,rsum,Etot = bin_photons(ai, flatEspec, amax, N, rbins, abins, [Emax_PI,Emin], rank=rank)
 
-    result,photcount,asum,zsum,rsum,Etot = bin_photons(ai, diracEspec, amax, N, rbins, abins, Edirac, rank=rank)
-    # result,photcount,asum,zsum,rsum,Etot = bin_photons(ai, flatEspec, amax, N, rbins, abins, [Emax_PI,Emin], rank=rank, npstate=npstate)
-    
-    #Gather the arrays from all the CPUs
-    result=comm.gather(result,root=0)
-    photcount=comm.gather(photcount,root=0)
-    asum=comm.gather(asum,root=0)
-    zsum=comm.gather(zsum,root=0)
-    rsum=comm.gather(rsum,root=0)
-    Etot=comm.gather(Etot,root=0)
-    if not rank:
-        #sum them together
-        mresult=np.zeros_like(result[0])
-        mphotcount=np.zeros_like(photcount[0])
-        masum=np.zeros_like(asum[0])
-        mzsum=np.zeros_like(zsum[0])
-        mrsum=np.zeros_like(rsum[0])
-        mEtot=0.
-        for ss in range(len(result)):
-            mphotcount+=photcount[ss]
-            mresult+=result[ss]
-            masum+=asum[ss]
-            mzsum+=zsum[ss]
-            mrsum+=rsum[ss]
-            mEtot+=Etot[ss]
+        #Gather the arrays from all the CPUs
+        result=comm.gather(result,root=0)
+        photcount=comm.gather(photcount,root=0)
+        asum=comm.gather(asum,root=0)
+        zsum=comm.gather(zsum,root=0)
+        rsum=comm.gather(rsum,root=0)
+        Etot=comm.gather(Etot,root=0)
+        if not rank:
+            #sum them together
+            mresult=np.zeros_like(result[0])
+            mphotcount=np.zeros_like(photcount[0])
+            masum=np.zeros_like(asum[0])
+            mzsum=np.zeros_like(zsum[0])
+            mrsum=np.zeros_like(rsum[0])
+            mEtot=0.
+            for ss in range(len(result)):
+                mphotcount+=photcount[ss]
+                mresult+=result[ss]
+                masum+=asum[ss]
+                mzsum+=zsum[ss]
+                mrsum+=rsum[ss]
+                mEtot+=Etot[ss]
 
-        #save the binned statistics
-        tit='z'+str(int(1/ai-1))+'_'+'E_dirac'+str(Edirac)+'_N'+str(Ntot)+'_binned_v2_fix'
-        print(tit)
-        fil=tit+'.pkl'
-        with open('./pickle/'+fil, "wb") as f:
-            pickle.dump(mresult,f)
-            pickle.dump(mphotcount,f)
-            pickle.dump(masum,f)
-            pickle.dump(mzsum,f)
-            pickle.dump(mrsum,f)
-            pickle.dump(mEtot,f)
+            #save the binned statistics
+            tit='z'+str(int(1/ai-1))+'_'+'E_dirac'+str(Edirac)+'_N'+str(Ntot)+'_binned_v2'
+            fil=tit+'.pkl'
+            print(tit)
+            with open(fol+fil, "wb") as f:
+                pickle.dump(mresult,f)
+                pickle.dump(mphotcount,f)
+                pickle.dump(masum,f)
+                pickle.dump(mzsum,f)
+                pickle.dump(mrsum,f)
+                pickle.dump(mEtot,f)
