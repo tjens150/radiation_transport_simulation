@@ -33,10 +33,10 @@ nh0=(1-YHe)*11.3*omegab*h**2 #density of hydrogen today
 
 
 #Background ionization history from HyRec                                                            
-ldf=np.loadtxt('/Users/Acolyte/NYU/Research/jupyter/radtrans/bg_xe.dat')
+ldf=np.loadtxt('./bg_xe.dat')
 zint=ldf[:,0] #loads in z arr
-xeint=ldf[zint >= 50.,1] #reionization becomes relevant after z=50
-zint=zint[zint >=50.]
+xeint=ldf[zint >= 20.,1] #reionization becomes relevant after z=50
+zint=zint[zint >=20.]
 np.where(xeint >1, xeint, 1.) #code breaks with xe>1, ignore Helium, it is recombined near H recomb
 xe=interpolate.interp1d(1/(zint+1),xeint)
 
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     logE=np.linspace(np.log(1),np.log(me*Edirac),nEbins)
     Ebins=np.insert(np.exp(logE),0,0)
 
-    fol='./pickle/photion/tab'
+    fol='./pickle/photion/tab/'
 
     afinal=1/101.                                                                                
     aliststep=0.025                                                                              
@@ -302,18 +302,16 @@ if __name__ == '__main__':
     size = comm.Get_size() #number of CPUs                                                       
     np.random.seed() #reinitialize a random state for each CPU                                   
     #divide for each CPU
-    N=int(ailist.size/size)
-    ailist=[rank*N:(rank+1)*N]
-    if not rank:
-        N+=(Ntot-N*size)
+    ailist=ailist[rank::size]
 
+    dlnastep=0.01
+    progint=100.
+    ailist=[ailist[0]]
     #    ailist=[ai_bin]                                                                         
     for ai in ailist:                  
-        Einit,Etot=init_Earr(Ntot,flatEspec,[Emax,Emin])
-        dlnastep=0.01
-        progint=1000.
+        Einit,Etot=init_Earr(Ntot,flatEspec,[Emax_PI,Emin])
         result,photcount,asum,tarr=evolve_arr(Einit,ai,abins.max(),dlnastep,rbins,abins,progint)
-        tit='z'+str(int(1/ai-1))+'_'+'E_dirac'+str(Edirac)+'_N'+str(Ntot)+'_dlna'+str(dlnastep)+'_tab'
+        tit='z'+str(int(1/ai-1))+'_'+'E_flat'+str(Emax_PI)+'_N'+str(Ntot)+'_dlna'+str(dlnastep)+'_tab_PI'
         print(tit)
         fil=tit+'.pkl'
         with open(fol+fil, "wb") as f:
