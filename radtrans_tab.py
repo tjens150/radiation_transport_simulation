@@ -83,18 +83,24 @@ def rej(a,b,f,g,Earr,randarr):
     crit=np.ones_like(Earr,dtype=bool)
     x=np.zeros_like(Earr)
     #pdb.set_trace()
+    count=0
     while np.any(crit):#y >=px
         thisrand=randarr[:Earr.size][crit]
         thisE=Earr[crit]
         x[crit]=thisrand*(b-a)+a
         randarr=cycle_prob(randarr)
-        thisrand=randarr[:Earr.size][crit]
+        thisrand=randarr[-Earr.size:][crit]
         y=thisrand*g(thisE)
         px=f(x[crit],thisE)
         thiscrit=crit[crit]
         thiscrit[y<px]=False
         (crit[crit])=thiscrit
         randarr=cycle_prob(randarr)
+        count+=1
+        if (count == 10000):
+            print('Warning, got stuck in rej, resampling random')
+            randarr=np.random.uniform(size=randarr.size)
+            count=0
     return x
 
 #the rotation matrix R that rotates (sin(th) cos(ph), sin(th) sin(ph), cos(th)) into (0, 0, 1)
@@ -127,7 +133,7 @@ def probHeion(Eistep,sigH): #prob of Helium ionization
     return Heco*sig_He(Eistep,sigH)
 
 def cycle_prob(randarr):
-    return np.roll(randarr,np.int(randarr[0]*randarr.size)) #cycle through random arr for psuedo-psuedo-random
+    return np.roll(randarr,1) #cycle through random arr for psuedo-psuedo-random
 
 def check_act(Eiarr,astep,dstep,not_term,randarr):
     Eistep=Eiarr[not_term]
@@ -295,18 +301,24 @@ if __name__ == '__main__':
     afinal=1/101.                                                                                
     aliststep=0.025                                                                              
     ailist=np.exp(np.arange(np.log(ai_bin),np.log(afinal),aliststep))                            
-
+    
+    tt=np.asarray([1323,1290,1391,1426,1462,1110,1197,1167,932,1005,980,822],dtype=int)
+    cut=np.ones_like(ailist,dtype=bool)
+    for it in tt:
+        cut=np.where((1/ailist-1).astype(int)==it,False,cut)
+    ailist=ailist[cut]
     comm = MPI.COMM_WORLD #fork CPUs                                                             
 
     rank = comm.Get_rank() #get unique identifier for each CPU                                   
     size = comm.Get_size() #number of CPUs                                                       
     np.random.seed() #reinitialize a random state for each CPU                                   
     #divide for each CPU
+    
     ailist=ailist[rank::size]
 
     dlnastep=0.01
     progint=100.
-    ailist=[ailist[0]]
+    ailist=ailist[1:]
     #    ailist=[ai_bin]                                                                         
     for ai in ailist:                  
         Einit,Etot=init_Earr(Ntot,flatEspec,[Emax_PI,Emin])
