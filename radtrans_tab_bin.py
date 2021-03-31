@@ -40,13 +40,26 @@ zint=zint[zint >=20.]
 np.where(xeint >1, xeint, 1.) #code breaks with xe>1, ignore Helium, it is recombined near H recomb
 xe=interpolate.interp1d(1/(zint+1),xeint)
 
-#fraction of electron energy that goes into ICS <10.2 photons (energy sink)
-with open('./gam102.pkl',"rb") as f:
+# #fraction of electron energy that goes into ICS <10.2 photons (energy sink)
+# with open('./gam102.pkl',"rb") as f:
+#     Earr102=pickle.load(f)
+#     aarr102=np.flip(pickle.load(f))
+#     gam102=np.flip(pickle.load(f),axis=1)
+
+# frac102=interpolate.RectBivariateSpline(Earr102,aarr102,gam102) #interpolation must be strictly ascending, hence the flips. Also to remind grid=False for pulling values
+
+
+with open('./gam_all.pkl',"rb") as f:
     Earr102=pickle.load(f)
     aarr102=np.flip(pickle.load(f))
-    gam102=np.flip(pickle.load(f),axis=1)
+    rat_ion=np.flip(pickle.load(f),axis=1)
+    rat_exc=np.flip(pickle.load(f),axis=1)
+    rat_heat=np.flip(pickle.load(f),axis=1)
 
-frac102=interpolate.RectBivariateSpline(Earr102,aarr102,gam102) #interpolation must be strictly ascending, hence the flips. Also to remind grid=False for pulling values
+frac_ion=interpolate.RectBivariateSpline(Earr102,aarr102,rat_ion) 
+frac_exc=interpolate.RectBivariateSpline(Earr102,aarr102,rat_exc) 
+frac_heat=interpolate.RectBivariateSpline(Earr102,aarr102,rat_heat) 
+#interpolation must be strictly ascending, hence the flips. Also to remind grid=False for pulling values
 
 
 #COEFFICIENCTS FOR EFFICIENCY
@@ -96,14 +109,14 @@ def rej(a,b,f,g,Earr,randarr):
         thisrand=randarr[:Earr.size][crit]
         thisE=Earr[crit]
         x[crit]=thisrand*(b-a)+a
-        randarr=cycle_prob(randarr)
+        randarr=cycle_prob(randarr, fullrand=False)
         thisrand=randarr[-Earr.size:][crit]
         y=thisrand*g(thisE)
         px=f(x[crit],thisE)
         thiscrit=crit[crit]
         thiscrit[y<px]=False
         (crit[crit])=thiscrit
-        randarr=cycle_prob(randarr)
+        randarr=cycle_prob(randarr, fullrand=False)
         count+=1
         if (count == 10000):
             print('Warning, got stuck in rej, resampling random')
@@ -140,8 +153,9 @@ def probHion(xestep,sigH): #prob of Hydrogen ionization
 def probHeion(Eistep,sigH): #prob of Helium ionization
     return Heco*sig_He(Eistep,sigH)
 
-def cycle_prob(randarr):
-    return np.roll(randarr,1) #cycle through random arr for psuedo-psuedo-random
+def cycle_prob(randarr,fullrand=True):
+    if fullrand: return np.random.uniform(size=randarr.size)
+    return np.roll(randarr,1) #np.roll(randarr,3) #cycle through random arr for psuedo-psuedo-random
 
 def check_act(Eiarr,astep,dstep,minprob,not_term,randarr,photoio_flag=True):
     Eistep=Eiarr[not_term]
@@ -171,23 +185,35 @@ def binstats(r,quant,thisbin):
 
 # Computes histograms for delta E, a, z, and number of scatterings for Nphot photons injected at ai,
 # using any energy spcetrum function's CDF. Also returns total energy injected from Nphot photons
-def bin_photons(ai, abinind, rarr, dEph, rbins, abins,result,photcount,asum,splitbinflag,splitfrac):
+def bin_photons(ai, abinind, rarr, dEph, rbins, abins,result,photcount,asum,splitbinflag,splitfrac,thisN):
     #Initialize arrays for binning, both the sum of quantity and sum of the square for variance
     if splitbinflag: #if our step enters into a new bin, must split into both bins
-        result[:,abinind] += binstats(rarr,dEph*splitfrac,rbins)
-        result[:,abinind-1] += binstats(rarr,dEph*(1-splitfrac),rbins)
+        for i in range(3): #in order ion, exc, heat
+            this_Efrac=frac_dep(ai,dEph,i)
+            result[:,abinind,i] += binstats(rarr,this_Efrac*splitfrac,rbins)
+            result[:,abinind-1,i] += binstats(rarr,this_Efrac*(1-splitfrac),rbins)
         photcount[:,abinind] += binstats(rarr,np.ones_like(rarr)*splitfrac,rbins)
         photcount[:,abinind-1] += binstats(rarr,np.ones_like(rarr)*(1-splitfrac),rbins)
     else:
-        result[:,abinind] += binstats(rarr,dEph,rbins)
+        for i in range(3): #in order ion, exc, heat
+            this_Efrac=frac_dep(ai,dEph,i)
+            result[:,abinind,i] += binstats(rarr,this_Efrac,rbins)
         photcount[:,abinind] += binstats(rarr,np.ones_like(rarr),rbins)
     asum[:,abinind] += binstats(rarr,np.full_like(rarr,ai),rbins)  #for the time being splitting these other statistics is negligible  
     return result, photcount, asum
 
-def frac_dep(tmpastep,tmpdE,ics_flag=True):
-    # if len(tmpdE)<1: return np.asarray([])
-    if not ics_flag: return 1
-    return tmpdE*(1-frac102(tmpdE,tmpastep,grid=False))
+# def frac_dep(tmpastep,tmpdE,ics_flag=True):
+#     # if len(tmpdE)<1: return np.asarray([])
+#     if not ics_flag: return tmpdE
+#     return tmpdE*(1-frac102(tmpdE,tmpastep,grid=False))
+
+def frac_dep(tmpastep,tmpdE,i):
+    if i == 0:
+        return tmpdE*(frac_ion(tmpdE,tmpastep,grid=False))
+    if i == 1:
+        return tmpdE*(frac_exc(tmpdE,tmpastep,grid=False))
+    if i == 2:
+        return tmpdE*(frac_heat(tmpdE,tmpastep,grid=False))
 
 def dtfunc(a1,a2): #Compute the time between two scale factors in a matter+rad dom
         return 2/(3*H0*np.sqrt(omegaM))*(a2*np.sqrt(a2+aeq)-a1*np.sqrt(a1+aeq)+2*aeq*(np.sqrt(a1+aeq)-np.sqrt(a2+aeq)))
@@ -198,7 +224,7 @@ def evolve_arr(Einit,ai,amax,dlnastep,minprob,rbins,abins,progint,ics_flag=True,
     vec=np.zeros((3,Eistep.size))
     thisdE=np.zeros(Eistep.size)
     randarr=np.random.uniform(size=(Eistep.size))
-    result=np.zeros([len(rbins)-1,len(abins)-1]) #delta E
+    result=np.zeros([len(rbins)-1,len(abins)-1,3]) #delta E in three channels, ion, exc, heat
     photcount=np.zeros([len(rbins)-1,len(abins)-1]) #number of scatterings in each bin
     asum=np.zeros([len(rbins)-1,len(abins)-1]) #statistics for a
     thisN=1.
@@ -232,7 +258,8 @@ def evolve_arr(Einit,ai,amax,dlnastep,minprob,rbins,abins,progint,ics_flag=True,
             thisdE[flagarr[0,:]]=frac_dep(astep,Eistep[flagarr[0,:]]-13.6,ics_flag=ics_flag) #compute dE Hydrogen ionization
             Eistep[ionbool]= 0. #Deposit energy for H or He ionization
         
-        comptbool=(~ionbool)*flagarr[2,:] #Compton scattering boolean (Ionization supersedes Compton)
+
+        comptbool=not_term*flagarr[2,:] #Compton scattering boolean (Ionization supersedes Compton)
         if np.any(comptbool):
             randarr=cycle_prob(randarr)
             dEcompt,theta,phi=compt_scat(Eistep[comptbool],randarr) #For compton scattered photons, compute dE and angle
@@ -244,12 +271,12 @@ def evolve_arr(Einit,ai,amax,dlnastep,minprob,rbins,abins,progint,ics_flag=True,
         allbool=ionbool+comptbool
         if np.any(allbool):
             result,photcount,asum=bin_photons(astep, abinind, np.sqrt((vec[:,allbool]**2).sum(axis=0))/mpc,
-                                              thisdE[allbool]/thisN, rbins, abins,result,photcount,asum,splitbinflag,splitfrac)
+                                              thisdE[allbool], rbins, abins,result,photcount,asum,splitbinflag,splitfrac,thisN)
         
         #prepare for next iteration
-        vec[2,:]+=Lstepco*((aeq+astep*(1+dlna))**(1/2.)-(aeq+astep)**(1/2.))
         if np.any(comptbool):
             vec[:,comptbool]=np.einsum('ij...,j...->i...',rotmat(theta,phi),vec[:,comptbool])
+        vec[2,:]+=Lstepco*((aeq+astep*(1+dlna))**(1/2.)-(aeq+astep)**(1/2.))
         
         Eistep=Eistep/(1+dlna)
         astep=astep*(1+dlna)
@@ -261,9 +288,9 @@ def evolve_arr(Einit,ai,amax,dlnastep,minprob,rbins,abins,progint,ics_flag=True,
             tmp[:,:nalive]=vec[:,not_term]
             vec[:,~not_term]=tmp
             
-            tmp=thisdE[~not_term]
-            tmp[:nalive]=thisdE[not_term]
-            thisdE[~not_term]=tmp
+            # tmp=thisdE[~not_term]
+            # tmp[:nalive]=thisdE[not_term]
+            # thisdE[~not_term]=tmp
 
             tmp=Eistep[~not_term]
             tmp[:nalive]=Eistep[not_term]
@@ -274,7 +301,8 @@ def evolve_arr(Einit,ai,amax,dlnastep,minprob,rbins,abins,progint,ics_flag=True,
             not_term[~not_term]=tmp
 
             thisN*=2.
-
+        
+        thisdE=np.zeros(Eistep.size)
         if np.any(np.isclose(astep,progarr,atol=dlna/2.*astep,rtol=0.)):
             tarr[tcount]=time.time()-tt
             print('Current z=%0.2f, with zmax=%0.2f. %s alive photons. Elapsed Time= %0.2f s (dlna= %.2E)' % (1/astep-1,1/amax-1,nalive,tarr[tcount],dlna))
@@ -311,7 +339,11 @@ if __name__ == '__main__':
     Emax=.447 #collisional ionization case                                                       
     Emax_PI=20.1 #photoionized case                                                              
     Emin=0.045 #Lower energy bound from which to sample, below this (2*pi*fine structure), photon wavelength is larger than bohr radius. (units of me)                                           
-    Edirac=5 #if using dirac injection (units of me)                                             
+    Edirac=17.61609 #if using dirac injection (units of me)                                             
+    mbh_T_arr=np.loadtxt('./MBH1_T.dat') #in units of me
+    E_int=interpolate.interp1d(1/(mbh_T_arr[:,0]+1),mbh_T_arr[:,1],fill_value='extrapolate',bounds_error=False) # v_bc=0
+    
+    
 
     #2d bin initialization                                                                       
     astep=0.01
@@ -330,14 +362,16 @@ if __name__ == '__main__':
     logE=np.linspace(np.log(1),np.log(me*Edirac),nEbins)
     Ebins=np.insert(np.exp(logE),0,0)
 
-    fol='./pickle/photion/tab/'
+    fol='./pickle/photion/tab/fixed_03_2021/channels/'
     
     #extend=np.flip(-np.arange(-np.log(abins[0])+astep/2.,-np.log(1/2001.)+astep/2.,astep/2.))
     #abins=np.insert(abins,0,np.exp(extend))
     afinal=1/101.                                                                                
     aliststep=0.025                                                                              
     ailist=np.exp(np.arange(np.log(ai_bin)-aliststep/2.,np.log(afinal)-aliststep/2.,aliststep/2.))         #DOUBLING RESOLUTION ATM
-    ailist=np.asarray([1/1301.,1/901.])
+    #ailist=np.asarray([1/1301.,1/901.])
+    #ailist=[1/1486.7734]#,1/958.7315]
+    # ailist=ailist[-16::6]
 
     #afinal =1/1501.
     #aliststep=0.025/2.
@@ -361,12 +395,15 @@ if __name__ == '__main__':
     minprob=0.01/2. #at max .25% chance of scattering
     dlnastep=0.005/2. #min step required from binning 2 times smaller than adep bin
     progint=100.
-    for ai in ailist:                  
-        #Einit,Etot=init_Earr(Ntot,flatEspec,[Emax,Emin])
-        Einit,Etot=init_Earr(Ntot,diracEspec,Edirac)
+    for ai in ailist:
+        #this_Emax=E_int(ai)
+        this_Emax=Emax
+        Einit,Etot=init_Earr(Ntot,flatEspec,[this_Emax,Emin])
+        #Einit,Etot=init_Earr(Ntot,diracEspec,Edirac)
         result,photcount,asum,tarr=evolve_arr(Einit,ai,abins.max(),dlnastep,minprob,rbins,abins,progint,ics_flag=ics_flag,photoio_flag=photoio_flag)
-        #tit='z'+str(int(1/ai-1))+'_'+'E_flat'+str(Emax)+'_N'+str(Ntot)+'_dlna'+str(dlnastep)+'_tab_frac_bin'
-        tit='z'+str(int(1/ai-1))+'_'+'E_dirac'+str(Emax)+'_N'+str(Ntot)+'_dlna'+str(dlnastep)+'_tab_frac_bin_noICSPI'
+        #tit='z'+str(int(1/ai-1))+'_'+'E_dirac'+str(Edirac)+'_N'+str(Ntot)+'_dlna'+str(dlnastep)+'_noICSnoPI'
+        tit='z'+str(int(1/ai-1))+'_'+'E_flat'+str(this_Emax)+'_N'+str(Ntot)+'_dlna'+str(dlnastep)
+        # tit='z'+str(int(1/ai-1))+'_'+'E_dirac'+str(Edirac)+'_N'+str(Ntot)+'_dlna'+str(dlnastep)+'_tab_frac_bin'
         print(tit)
         fil=tit+'.pkl'
         with open(fol+fil, "wb") as f:
