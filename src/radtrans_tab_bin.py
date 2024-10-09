@@ -49,7 +49,7 @@ xe=interpolate.interp1d(1/(zint+1),xeint)
 # frac102=interpolate.RectBivariateSpline(Earr102,aarr102,gam102) #interpolation must be strictly ascending, hence the flips. Also to remind grid=False for pulling values
 
 
-with open('./gam_all.pkl',"rb") as f:
+with open('../dep/gam_all.pkl',"rb") as f:
     Earr102=pickle.load(f)
     aarr102=np.flip(pickle.load(f))
     rat_ion=np.flip(pickle.load(f),axis=1)
