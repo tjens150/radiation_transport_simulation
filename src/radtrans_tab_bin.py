@@ -362,7 +362,7 @@ if __name__ == '__main__':
     logE=np.linspace(np.log(1),np.log(me*Edirac),nEbins)
     Ebins=np.insert(np.exp(logE),0,0)
 
-    fol='./pickle/photion/tab/fixed_03_2021/channels/'
+    fol='../pickle/photion/tab/fixed_03_2021/channels/'
     
     #extend=np.flip(-np.arange(-np.log(abins[0])+astep/2.,-np.log(1/2001.)+astep/2.,astep/2.))
     #abins=np.insert(abins,0,np.exp(extend))
