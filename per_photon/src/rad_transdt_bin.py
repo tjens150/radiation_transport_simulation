@@ -7,6 +7,8 @@ from math import pi
 import pickle as pickle
 from mpi4py import MPI
 import sys
+# adding dep folder to the system path
+sys.path.insert(0, '../dep')
 from _pulla_cy import pulla
 from scipy.stats import binned_statistic_2d
 import time
